@@ -17,19 +17,22 @@ def clear_canvas():
     """
     canvas.delete("all")
 
-# ROOT WINDOW
-root = tk.Tk()
-root.title("My Canvas")
+# main
+if __name__ == "__main__":
 
-# CANVAS
-canvas = tk.Canvas(root, width=300, height=200)
-canvas.config(bg='gray')
-canvas.pack()
-canvas.bind("<B1-Motion>", paint)
+    # ROOT WINDOW
+    root = tk.Tk()
+    root.title("My Canvas")
 
-# CLEAR BUTTON
-clear_button = tk.Button(root, text="Clear Canvas", command=clear_canvas)
-clear_button.pack()
+    # CANVAS
+    canvas = tk.Canvas(root, width=300, height=200)
+    canvas.config(bg='gray')
+    canvas.pack()
+    canvas.bind("<B1-Motion>", paint)
 
-# MAIN LOOP
-root.mainloop()
+    # CLEAR BUTTON
+    clear_button = tk.Button(root, text="Clear Canvas", command=clear_canvas)
+    clear_button.pack()
+
+    # MAIN LOOP
+    root.mainloop()
