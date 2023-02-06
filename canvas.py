@@ -1,6 +1,6 @@
 import tkinter as tk
 import math
-import StoredGestures
+import stored_gestures
 
 raw_input_points = [] #Contains the raw points for the user's currently drawn gesture
 

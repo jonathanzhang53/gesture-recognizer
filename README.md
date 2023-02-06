@@ -2,4 +2,4 @@
 
 `cd src`
 
-`python canvas.py`
+`python 1_dollar.py`
