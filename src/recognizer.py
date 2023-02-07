@@ -9,6 +9,38 @@ class DollarRecognizer:
         self.raw_gesture_templates = raw_gesture_templates
         self.points = points
     
+    def path_length(self): #Determines the total length of a given list of points.
+        small_d = 0
+        for i in range(1, len(self.points)):
+            small_d += (math.sqrt(math.pow((self.points[i][0]) - (self.points[i-1][0]), 2)+math.pow((self.points[i][1]) - (self.points[i-1][1]), 2)))
+        return small_d
+    
+    def resample(self): #Resamples the given list of points into N evenly spaced points.
+        raw_list = self.points
+        if len(raw_list) >= self.N_RESAMPLE_POINTS:
+            resampled_list = [raw_list[0]]
+            i = self.path_length() / (self.N_RESAMPLE_POINTS - 1)
+            d = 0
+
+            while len(raw_list) > 1:
+                small_d = math.sqrt(math.pow((raw_list[0][0]) - (raw_list[1][0]), 2) + math.pow((raw_list[0][1]) - (raw_list[1][1]), 2))
+                
+                if (d + small_d) >= i:
+                    q_x = (raw_list[0][0]) + ((i-d) / small_d) * ((raw_list[1][0]) - (raw_list[0][0]))
+                    q_y = (raw_list[0][1]) + ((i-d) / small_d) * ((raw_list[1][1]) - (raw_list[0][1]))
+                    resampled_list.append((q_x, q_y))
+                    raw_list.pop(0)
+                    raw_list.insert(0, (q_x, q_y))
+                    d = 0
+                else:
+                    raw_list.pop(0)
+                    d += small_d
+            
+            if len(resampled_list) < self.N_RESAMPLE_POINTS:
+                resampled_list.append(raw_list[0])
+
+            return resampled_list
+
     def compute_centroid(self):
         centroid_x = sum(point[0] for point in self.points) / self.N_RESAMPLE_POINTS
         centroid_y = sum(point[1] for point in self.points) / self.N_RESAMPLE_POINTS
@@ -29,7 +61,7 @@ class DollarRecognizer:
             q_y = point[1] - centroid_y
             rotated_x = q_x * math.cos(omega) - q_y * math.sin(omega) + centroid_x
             rotated_y = q_x * math.sin(omega) + q_y * math.cos(omega) + centroid_y
-            rotated_points.append(rotated_x, rotated_y)
+            rotated_points.append((rotated_x, rotated_y))
 
         return rotated_points
 
