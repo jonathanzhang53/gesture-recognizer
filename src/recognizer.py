@@ -108,21 +108,27 @@ class DollarRecognizer:
 
         return translated_points
 
-    def identify_gesture(self, size: float | int):
+    def recognize(self, size: float | int) -> tuple:
         """
         identifies the gesture by comparing the given list of points to the stored gesture templates
 
         parameters:
         ----------
             size: the size passed to scale_to from step 3
+
+        Returns:
+        ----------
+            a tuple containing (gesture, score)
         """
         b = float("inf")
+        gesture = ""
         for t in self.raw_gesture_templates:
             d = self.distance_at_best_angle(t, -45, 45, 2)
             if d < b:
                 b = d
                 gesture = t.name
         score = 1 - (b / (0.5 * math.sqrt(size ^ 2 + size ^ 2)))
+        return (gesture, score)
 
     def distance_at_best_angle(
         self, t: list, thetaA: float | int, thetaB: float | int, thetaDelta: float | int
@@ -136,6 +142,10 @@ class DollarRecognizer:
             thetaA: the lower bound of the angle range to search in degrees
             thetaB: the upper bound of the angle range to search in degrees
             thetaDelta: the step size for the angle range in degrees
+
+        Returns:
+        ----------
+            a float representing the distance at the best angle
         """
         phi = 0.5 * (-1 + math.sqrt(5))
         x1 = phi * thetaA + (1 - phi) * thetaB
@@ -170,6 +180,10 @@ class DollarRecognizer:
         ----------
         a: list of points for a in the format [(x, y), ...]
         b: list of points for b in the format [(x, y), ...]
+
+        Returns:
+        ----------
+            the average distance between and b as a float
         """
         d = 0
         for i in range(len(a)):
