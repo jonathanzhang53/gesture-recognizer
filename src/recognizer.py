@@ -1,21 +1,26 @@
 import math
 from stored_gestures import raw_gesture_templates
 
-class DollarRecognizer:
 
+class DollarRecognizer:
     N_RESAMPLE_POINTS = 64
 
     def __init__(self, points):
         self.raw_gesture_templates = raw_gesture_templates
         self.points = points
-    
-    def path_length(self): #Determines the total length of a given list of points.
+
+    def path_length(self):  # Determines the total length of a given list of points.
         small_d = 0
         for i in range(1, len(self.points)):
-            small_d += (math.sqrt(math.pow((self.points[i][0]) - (self.points[i-1][0]), 2)+math.pow((self.points[i][1]) - (self.points[i-1][1]), 2)))
+            small_d += math.sqrt(
+                math.pow((self.points[i][0]) - (self.points[i - 1][0]), 2)
+                + math.pow((self.points[i][1]) - (self.points[i - 1][1]), 2)
+            )
         return small_d
-    
-    def resample(self): #Resamples the given list of points into N evenly spaced points.
+
+    def resample(
+        self,
+    ):  # Resamples the given list of points into N evenly spaced points.
         raw_list = self.points
         if len(raw_list) >= self.N_RESAMPLE_POINTS:
             resampled_list = [raw_list[0]]
@@ -23,11 +28,18 @@ class DollarRecognizer:
             d = 0
 
             while len(raw_list) > 1:
-                small_d = math.sqrt(math.pow((raw_list[0][0]) - (raw_list[1][0]), 2) + math.pow((raw_list[0][1]) - (raw_list[1][1]), 2))
-                
+                small_d = math.sqrt(
+                    math.pow((raw_list[0][0]) - (raw_list[1][0]), 2)
+                    + math.pow((raw_list[0][1]) - (raw_list[1][1]), 2)
+                )
+
                 if (d + small_d) >= i:
-                    q_x = (raw_list[0][0]) + ((i-d) / small_d) * ((raw_list[1][0]) - (raw_list[0][0]))
-                    q_y = (raw_list[0][1]) + ((i-d) / small_d) * ((raw_list[1][1]) - (raw_list[0][1]))
+                    q_x = (raw_list[0][0]) + ((i - d) / small_d) * (
+                        (raw_list[1][0]) - (raw_list[0][0])
+                    )
+                    q_y = (raw_list[0][1]) + ((i - d) / small_d) * (
+                        (raw_list[1][1]) - (raw_list[0][1])
+                    )
                     resampled_list.append((q_x, q_y))
                     raw_list.pop(0)
                     raw_list.insert(0, (q_x, q_y))
@@ -35,7 +47,7 @@ class DollarRecognizer:
                 else:
                     raw_list.pop(0)
                     d += small_d
-            
+
             if len(resampled_list) < self.N_RESAMPLE_POINTS:
                 resampled_list.append(raw_list[0])
 
@@ -50,7 +62,9 @@ class DollarRecognizer:
     def indicative_angle(self):
         centroid_x, centroid_y = self.compute_centroid()
 
-        return math.atan2(centroid_y - self.points[0][1], centroid_x - self.points[0][0])
+        return math.atan2(
+            centroid_y - self.points[0][1], centroid_x - self.points[0][0]
+        )
 
     def rotate_by(self, omega):
         centroid_x, centroid_y = self.compute_centroid()
@@ -91,5 +105,74 @@ class DollarRecognizer:
             q_x = point[0] + k[0] - centroid_x
             q_y = point[1] + k[1] - centroid_y
             translated_points.append((q_x, q_y))
-        
+
         return translated_points
+
+    def identify_gesture(self, size: float | int):
+        """
+        identifies the gesture by comparing the given list of points to the stored gesture templates
+
+        parameters:
+        ----------
+            size: the size passed to scale_to from step 3
+        """
+        b = float("inf")
+        for t in self.raw_gesture_templates:
+            d = self.distance_at_best_angle(t, -45, 45, 2)
+            if d < b:
+                b = d
+                gesture = t.name
+        score = 1 - (b / (0.5 * math.sqrt(size ^ 2 + size ^ 2)))
+
+    def distance_at_best_angle(
+        self, t: list, thetaA: float | int, thetaB: float | int, thetaDelta: float | int
+    ) -> float:
+        """
+        finds the distance between the given list of points and the given gesture template at the best angle
+
+        parameters:
+        ----------
+            t: the gesture template to compare the list of points to
+            thetaA: the lower bound of the angle range to search in degrees
+            thetaB: the upper bound of the angle range to search in degrees
+            thetaDelta: the step size for the angle range in degrees
+        """
+        phi = 0.5 * (-1 + math.sqrt(5))
+        x1 = phi * thetaA + (1 - phi) * thetaB
+        f1 = self.distance_at_angle(t, x1)
+        x2 = (1 - phi) * thetaA + phi * thetaB
+        f2 = self.distance_at_angle(t, x2)
+        while abs(thetaB - thetaA) > thetaDelta:
+            if f1 < f2:
+                thetaB = x2
+                x2 = x1
+                f2 = f1
+                x1 = phi * thetaA + (1 - phi) * thetaB
+                f1 = self.distance_at_angle(t, x1)
+            else:
+                thetaA = x1
+                x1 = x2
+                f1 = f2
+                x2 = (1 - phi) * thetaA + phi * thetaB
+                f2 = self.distance_at_angle(t, x2)
+        return min(f1, f2)
+
+    def distance_at_angle(self, t: list, theta: float) -> float:
+        newPts = self.rotate_by(theta)
+        d = self.path_distance(newPts, t)
+        return d
+
+    def path_distance(self, a: list, b: list) -> float:
+        """
+        calculates the average distance between a and b point-wise
+
+        parameters:
+        ----------
+        a: list of points for a in the format [(x, y), ...]
+        b: list of points for b in the format [(x, y), ...]
+        """
+        d = 0
+        for i in range(len(a)):
+            # calculate the distance between points a and b and add to d
+            d += math.sqrt((a[i][0] - b[i][0]) ^ 2 + (a[i][1] - b[i][1]) ^ 2)
+        return d / len(a)
