@@ -123,11 +123,11 @@ class DollarRecognizer:
         b = float("inf")
         gesture = ""
         for t in self.raw_gesture_templates:
-            d = self.distance_at_best_angle(t, -45, 45, 2)
+            d = self.distance_at_best_angle(self.raw_gesture_templates[t], -45, 45, 2)
             if d < b:
                 b = d
-                gesture = t.name
-        score = 1 - (b / (0.5 * math.sqrt(size ^ 2 + size ^ 2)))
+                gesture = t
+        score = 1 - (b / (0.5 * math.sqrt(size**2 + size**2)))
         return (gesture, score)
 
     def distance_at_best_angle(
@@ -186,7 +186,13 @@ class DollarRecognizer:
             the average distance between and b as a float
         """
         d = 0
-        for i in range(len(a)):
+        for i in range(min(len(a), len(b))):
             # calculate the distance between points a and b and add to d
-            d += math.sqrt((a[i][0] - b[i][0]) ^ 2 + (a[i][1] - b[i][1]) ^ 2)
+            d += math.sqrt((a[i][0] - b[i][0]) ** 2 + (a[i][1] - b[i][1]) ** 2)
         return d / len(a)
+
+
+if __name__ == "__main__":
+    triangle_test = raw_gesture_templates["triangle"]
+    triangle_recognizer = DollarRecognizer(triangle_test)
+    print(triangle_recognizer.recognize(1))
