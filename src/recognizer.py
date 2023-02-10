@@ -15,8 +15,6 @@ class DollarRecognizer:
         
     def processTemplates(self):
         for templateName, templatePoints in self.raw_gesture_templates.items():
-            if (len(templatePoints) < 64):
-                continue
             self.points = list(templatePoints)
             self.points = self.resample()
             omega = self.indicative_angle()
@@ -42,7 +40,7 @@ class DollarRecognizer:
 
     def resample(self):  # Resamples the given list of points into N evenly spaced points.
         raw_list = self.points
-        if len(raw_list) >= self.N_RESAMPLE_POINTS:
+        if len(raw_list) > 0:
             resampled_list = [raw_list[0]]
             i = self.path_length() / (self.N_RESAMPLE_POINTS - 1)
             d = 0
