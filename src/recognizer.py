@@ -1,14 +1,40 @@
 import math
+import json
+from collections import defaultdict
 from stored_gestures import raw_gesture_templates
-
 
 class DollarRecognizer:
     N_RESAMPLE_POINTS = 64
+    SIZE = 250
 
     def __init__(self, points):
         self.raw_gesture_templates = raw_gesture_templates
+        self.preprocessed_gesture_templates = defaultdict(list) # hashmap of with key = gesture name and value = list of templates
         self.points = points
+        # self.processTemplates()
+        
+    def processTemplates(self):
+        for templateName, templatePoints in self.raw_gesture_templates.items():
+            self.points = list(templatePoints)
 
+            # print(self.points)
+            
+            self.resample()
+            omega = self.indicative_angle()
+            self.rotate_by(omega)
+            # print(self.points)
+            self.scale_to(self.SIZE)
+            self.translate_to((0, 0))
+            self.preprocessed_gesture_templates[templateName].append(self.points)
+            # raw_gesture_templates["name of key"][0]["whatever coord you want"]
+
+            
+
+            # TODO: save preprocessed_gesture_templates to a file
+            # with open("preprocessed_gestures.json", "w") as f:
+            #     body = {templateName: self.points}
+            #     json.dump(body, f)
+    
     def path_length(self):  # Determines the total length of a given list of points.
         small_d = 0
         for i in range(1, len(self.points)):
@@ -18,9 +44,7 @@ class DollarRecognizer:
             )
         return small_d
 
-    def resample(
-        self,
-    ):  # Resamples the given list of points into N evenly spaced points.
+    def resample(self):  # Resamples the given list of points into N evenly spaced points.
         raw_list = self.points
         if len(raw_list) >= self.N_RESAMPLE_POINTS:
             resampled_list = [raw_list[0]]
@@ -168,6 +192,18 @@ class DollarRecognizer:
         return min(f1, f2)
 
     def distance_at_angle(self, t: list, theta: float) -> float:
+        """
+        Finds the distance between the given list of points and the given gesture template at the given angle
+        
+        parameters:
+        ----------
+        t: the gesture template to compare the list of points to
+        theta: the angle in degrees
+        
+        Returns:
+        ----------
+        The distance between the given list of points and the given gesture template at the given angle
+        """
         newPts = self.rotate_by(theta)
         d = self.path_distance(newPts, t)
         return d
@@ -190,7 +226,14 @@ class DollarRecognizer:
             # calculate the distance between points a and b and add to d
             d += math.sqrt((a[i][0] - b[i][0]) ** 2 + (a[i][1] - b[i][1]) ** 2)
         return d / len(a)
-
+    
+    def run(self):
+        self.resample()
+        omega = self.indicative_angle()
+        self.rotate_by(omega)
+        self.scale_to(self.SIZE)
+        self.translate_to((0, 0))
+        self.recognize(self.SIZE)
 
 if __name__ == "__main__":
     triangle_test = raw_gesture_templates["triangle"]
