@@ -1,6 +1,8 @@
 # Python GUI library
 import tkinter as tk
 
+from recognizer import DollarRecognizer
+
 class Canvas:
     """Canvas class for drawing gestures"""
 
@@ -19,6 +21,9 @@ class Canvas:
         self.text = tk.Text(self.root, height=1, width=40)
         self.canvas = tk.Canvas(self.root, width=300, height=200)
 
+        # initialize DollarRecognizer
+        self.dollar_recognizer = DollarRecognizer(self.raw_input_points)
+
     def run(self):
         """Run the canvas."""
         # ROOT WINDOW
@@ -31,6 +36,7 @@ class Canvas:
         self.canvas.config(bg="gray")
         self.canvas.pack()
         self.canvas.bind("<B1-Motion>", self.paint)
+        self.canvas.bind("<ButtonRelease-1>", self.on_mouseup)
 
         # CLEAR BUTTON
         clear_button = tk.Button(self.root, text="Clear Canvas", command=self.clear_canvas)
@@ -38,6 +44,12 @@ class Canvas:
 
         # MAIN LOOP
         self.root.mainloop()
+
+    def on_mouseup(self, event):
+        self.last_x = None
+        self.last_y = None
+        self.dollar_recognizer.points = self.raw_input_points
+        self.dollar_recognizer.run()
 
     def paint(self, event):
         """ 
@@ -57,7 +69,7 @@ class Canvas:
 
     def clear_canvas(self):
         """
-        Clear the canvas.
+        Clear the canvas and reset the stroke points.
         """
         self.canvas.delete("all")
         self.raw_input_points.clear()
