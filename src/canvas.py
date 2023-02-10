@@ -49,7 +49,9 @@ class Canvas:
         self.last_x = None
         self.last_y = None
         self.dollar_recognizer.points = self.raw_input_points
-        self.dollar_recognizer.run()
+        name_of_gesture, gesture_score = (self.dollar_recognizer.run())
+        self.text.delete("1.0", "end")
+        self.text.insert("1.0", "Result: " + name_of_gesture + ", Score: " + str(gesture_score))
 
     def paint(self, event):
         """ 

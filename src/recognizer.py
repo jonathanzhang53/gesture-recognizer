@@ -11,24 +11,20 @@ class DollarRecognizer:
         self.raw_gesture_templates = raw_gesture_templates
         self.preprocessed_gesture_templates = defaultdict(list) # hashmap of with key = gesture name and value = list of templates
         self.points = points
-        # self.processTemplates()
+        self.processTemplates()
         
     def processTemplates(self):
         for templateName, templatePoints in self.raw_gesture_templates.items():
+            if (len(templatePoints) < 64):
+                continue
             self.points = list(templatePoints)
-
-            # print(self.points)
-            
-            self.resample()
+            self.points = self.resample()
             omega = self.indicative_angle()
-            self.rotate_by(omega)
-            # print(self.points)
-            self.scale_to(self.SIZE)
-            self.translate_to((0, 0))
+            self.points = self.rotate_by(omega)
+            self.points = self.scale_to(self.SIZE)
+            self.points = self.translate_to((0, 0))
             self.preprocessed_gesture_templates[templateName].append(self.points)
-            # raw_gesture_templates["name of key"][0]["whatever coord you want"]
-
-            
+            # raw_gesture_templates["name of key"][template_index]["whatever coord you want"]
 
             # TODO: save preprocessed_gesture_templates to a file
             # with open("preprocessed_gestures.json", "w") as f:
@@ -146,12 +142,13 @@ class DollarRecognizer:
         """
         b = float("inf")
         gesture = ""
-        for t in self.raw_gesture_templates:
-            d = self.distance_at_best_angle(self.raw_gesture_templates[t], -45, 45, 2)
+        for tName, tPoints in self.preprocessed_gesture_templates.items():
+            d = self.distance_at_best_angle(tPoints[0], -45, 45, 2)
             if d < b:
                 b = d
-                gesture = t
+                gesture = tName
         score = 1 - (b / (0.5 * math.sqrt(size**2 + size**2)))
+        print(gesture)
         return (gesture, score)
 
     def distance_at_best_angle(
@@ -227,15 +224,17 @@ class DollarRecognizer:
             d += math.sqrt((a[i][0] - b[i][0]) ** 2 + (a[i][1] - b[i][1]) ** 2)
         return d / len(a)
     
-    def run(self):
-        self.resample()
+    def run(self) -> tuple:
+        self.points = self.resample()
         omega = self.indicative_angle()
-        self.rotate_by(omega)
-        self.scale_to(self.SIZE)
-        self.translate_to((0, 0))
-        self.recognize(self.SIZE)
+        self.points = self.rotate_by(omega)
+        self.points = self.scale_to(self.SIZE)
+        self.points = self.translate_to((0, 0))
+        gesture, score = self.recognize(self.SIZE)
+
+        return (gesture, score)
 
 if __name__ == "__main__":
     triangle_test = raw_gesture_templates["triangle"]
     triangle_recognizer = DollarRecognizer(triangle_test)
-    print(triangle_recognizer.recognize(1))
+    print(triangle_recognizer.recognize(250))
