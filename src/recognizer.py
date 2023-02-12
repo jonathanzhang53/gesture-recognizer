@@ -1,5 +1,6 @@
+# WRITTEN BY Katherine Chan, Thomas Ruby, Jonathan Zhang
+
 import math
-import json
 from collections import defaultdict
 from stored_gestures import raw_gesture_templates
 
@@ -7,13 +8,23 @@ class DollarRecognizer:
     N_RESAMPLE_POINTS = 64
     SIZE = 250
 
-    def __init__(self, points):
+    def __init__(self, points) -> None:
+        """
+        Initializes the DollarRecognizer class by setting class variables and calling the processTemplates method
+        
+        parameters:
+        ----------
+            points: list of points in the format [(x, y), ...]
+        """
         self.raw_gesture_templates = raw_gesture_templates
         self.preprocessed_gesture_templates = defaultdict(list) # hashmap of with key = gesture name and value = list of templates
         self.points = points
         self.processTemplates()
         
-    def processTemplates(self):
+    def processTemplates(self) -> None:
+        """
+        Preprocesses the raw gesture templates and saves them to a file
+        """
         for templateName, templatePoints in self.raw_gesture_templates.items():
             self.points = list(templatePoints)
             self.points = self.resample()
@@ -22,23 +33,38 @@ class DollarRecognizer:
             self.points = self.scale_to(self.SIZE)
             self.points = self.translate_to((0, 0))
             self.preprocessed_gesture_templates[templateName].append(self.points)
-            # raw_gesture_templates["name of key"][template_index]["whatever coord you want"]
 
             # TODO: save preprocessed_gesture_templates to a file
             # with open("preprocessed_gestures.json", "w") as f:
             #     body = {templateName: self.points}
             #     json.dump(body, f)
     
-    def path_length(self):  # Determines the total length of a given list of points.
+    def path_length(self) -> float:
+        """
+        Determines the total length of a given list of points
+
+        Returns:
+        ----------
+            the total length of a given list of points
+        """
         small_d = 0
+
         for i in range(1, len(self.points)):
             small_d += math.sqrt(
                 math.pow((self.points[i][0]) - (self.points[i - 1][0]), 2)
                 + math.pow((self.points[i][1]) - (self.points[i - 1][1]), 2)
             )
+
         return small_d
 
-    def resample(self):  # Resamples the given list of points into N evenly spaced points.
+    def resample(self) -> list:
+        """
+        Resamples the given list of points into N evenly spaced points.
+
+        Returns:
+        ----------
+            a resampled list of points of length N in the format [(x, y), ...]
+        """
         raw_list = self.points
         if len(raw_list) > 0:
             resampled_list = [raw_list[0]]
@@ -71,20 +97,45 @@ class DollarRecognizer:
 
             return resampled_list
 
-    def compute_centroid(self):
+    def compute_centroid(self) -> tuple:
+        """
+        Computes the centroid of all points
+        
+        Returns:
+        ----------
+            the centroid as a tuple in the format (x, y)
+        """
         centroid_x = sum(point[0] for point in self.points) / self.N_RESAMPLE_POINTS
         centroid_y = sum(point[1] for point in self.points) / self.N_RESAMPLE_POINTS
 
         return (centroid_x, centroid_y)
 
-    def indicative_angle(self):
+    def indicative_angle(self) -> float:
+        """
+        Finds the indicative angle based on the centroid and the first point
+        
+        Returns:
+        ----------
+            the indicative angle as a float in degrees
+        """
         centroid_x, centroid_y = self.compute_centroid()
 
         return math.atan2(
             centroid_y - self.points[0][1], centroid_x - self.points[0][0]
         )
 
-    def rotate_by(self, omega):
+    def rotate_by(self, omega) -> list:
+        """
+        Rotates all points by the indicative angle
+        
+        parameters:
+        ----------
+            omega: indicative angle in degrees
+        
+        Returns:
+        ----------
+            a list of points rotated by the indicative angle in the format [(x, y), ...)]
+        """
         centroid_x, centroid_y = self.compute_centroid()
         rotated_points = []
 
@@ -97,7 +148,18 @@ class DollarRecognizer:
 
         return rotated_points
 
-    def scale_to(self, size):
+    def scale_to(self, size) -> list:
+        """
+        Scales all points to a given size
+        
+        parameters:
+        ----------
+            size: predetermined size value to scale to
+        
+        Returns:
+        ----------
+            a list of points scaled to the predetermined size in the format [(x, y), ...)]
+        """
         min_x = min(point[0] for point in self.points)
         min_y = min(point[1] for point in self.points)
         max_x = max(point[0] for point in self.points)
@@ -114,7 +176,18 @@ class DollarRecognizer:
 
         return scaled_points
 
-    def translate_to(self, k):
+    def translate_to(self, k) -> list:
+        """
+        Translates the points to a center.
+
+        parameters:
+        ----------
+            k: origin to translate the points to.
+
+        Returns:
+        ----------
+            a list of translated points in the format [(x, y), ...)]
+        """
         centroid_x, centroid_y = self.compute_centroid()
 
         translated_points = []
@@ -128,7 +201,7 @@ class DollarRecognizer:
 
     def recognize(self, size: float | int) -> tuple:
         """
-        identifies the gesture by comparing the given list of points to the stored gesture templates
+        Identifies the gesture by comparing the given list of points to the stored gesture templates
 
         parameters:
         ----------
@@ -140,6 +213,7 @@ class DollarRecognizer:
         """
         b = float("inf")
         gesture = ""
+
         for tName, tPoints in self.preprocessed_gesture_templates.items():
             d = self.distance_at_best_angle(tPoints[0], -45, 45, 2)
             if d < b:
@@ -153,7 +227,7 @@ class DollarRecognizer:
         self, t: list, thetaA: float | int, thetaB: float | int, thetaDelta: float | int
     ) -> float:
         """
-        finds the distance between the given list of points and the given gesture template at the best angle
+        Finds the distance between the given list of points and the given gesture template at the best angle
 
         parameters:
         ----------
@@ -192,25 +266,26 @@ class DollarRecognizer:
         
         parameters:
         ----------
-        t: the gesture template to compare the list of points to
-        theta: the angle in degrees
+            t: the gesture template to compare the list of points to
+            theta: the angle in degrees
         
         Returns:
         ----------
-        The distance between the given list of points and the given gesture template at the given angle
+            the distance between the given list of points and the given gesture template at the given angle
         """
         newPts = self.rotate_by(theta)
         d = self.path_distance(newPts, t)
+
         return d
 
     def path_distance(self, a: list, b: list) -> float:
         """
-        calculates the average distance between a and b point-wise
+        Calculates the average distance between a and b point-wise
 
         parameters:
         ----------
-        a: list of points for a in the format [(x, y), ...]
-        b: list of points for b in the format [(x, y), ...]
+            a: list of points for a in the format [(x, y), ...]
+            b: list of points for b in the format [(x, y), ...]
 
         Returns:
         ----------

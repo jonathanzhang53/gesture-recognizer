@@ -1,3 +1,5 @@
+# WRITTEN BY Katherine Chan, Thomas Ruby, Jonathan Zhang
+
 # Python GUI library
 import tkinter as tk
 
@@ -46,6 +48,9 @@ class Canvas:
         self.root.mainloop()
 
     def on_mouseup(self, event):
+        """
+        When the mouse is released, run the recognizer and display the result
+        """
         self.last_x = None
         self.last_y = None
         self.dollar_recognizer.points = self.raw_input_points
