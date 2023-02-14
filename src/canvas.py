@@ -24,7 +24,7 @@ class Canvas:
         self.canvas = tk.Canvas(self.root, width=300, height=200)
 
         # initialize DollarRecognizer
-        self.dollar_recognizer = DollarRecognizer(self.raw_input_points)
+        self.dollar_recognizer = DollarRecognizer(self.raw_input_points, live=False, read=True)
 
     def run(self):
         """Run the canvas."""

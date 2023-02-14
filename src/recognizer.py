@@ -1,8 +1,9 @@
 # WRITTEN BY Katherine Chan, Thomas Ruby, Jonathan Zhang
 
-import math
+import math, os
 from collections import defaultdict
 import stored_gestures
+from bs4 import BeautifulSoup
 
 class DollarRecognizer:
     N_RESAMPLE_POINTS = 64
@@ -22,11 +23,44 @@ class DollarRecognizer:
             self.points = points
             self.processTemplates()
         else:
-            self.raw_gesture_templates = defaultdict(list) # hashmap of with key = gesture name and value = list of templates
+            self.raw_gesture_templates = stored_gestures.default_raw_gesture_templates
             self.preprocessed_gesture_templates = defaultdict(list) # hashmap of with key = gesture name and value = list of templates
             self.points = points
+            self.readDataset()
 
-        
+    def readDataset(self,speed="medium") -> dict:
+        for s in range(1,11):
+            dataset_subset = {}
+            print(s)
+            if s >= 10:
+                s = str(s)
+            elif s < 10:
+                s = "0" + str(s)
+            path = os.getcwd() + "\\xml_logs\\s" + s + "\\" + speed
+            list_of_files = os.listdir(path)
+            for i in range(1,11):
+                if i >= 10:
+                    i = str(i)
+                elif i < 10:
+                    i = "0" + str(i)
+                self.preprocessed_gesture_templates.clear()
+                file_set = []
+                for file_name in list_of_files:
+                    if file_name.find(s) != -1:
+                        file_set.append(file_name)
+                for file_name in file_set:
+                    self.points = []
+                    file = open(path+"\\"+file_name, 'r')
+                    file_XML_data = BeautifulSoup(file.read(),'lxml')
+                    header_XML = file_XML_data.find('gesture')
+                    gesture_name = header_XML["name"]
+                    all_points_XML = file_XML_data.find_all('point')
+                    for point_XML in all_points_XML:
+                        self.points.append((int(point_XML["x"]),int(point_XML["y"])))
+                self.processTemplates()
+                dataset_subset[int(i)] = self.preprocessed_gesture_templates
+            stored_gestures.preprocessed_dataset[int(s)] = dataset_subset
+
     def processTemplates(self) -> None:
         """
         Preprocesses the raw gesture templates and saves them to a file
