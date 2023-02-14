@@ -1,4 +1,6 @@
-raw_gesture_templates = {  # contains the same 16 raw templates found on the $1 website (https://depts.washington.edu/acelab/proj/dollar/dollar.js)
+from bs4 import BeautifulSoup
+import os
+default_raw_gesture_templates = {  # contains the same 16 raw templates found on the $1 website (https://depts.washington.edu/acelab/proj/dollar/dollar.js)
     "triangle": (
         (137, 139),
         (135, 141),
@@ -966,3 +968,23 @@ raw_gesture_templates = {  # contains the same 16 raw templates found on the $1 
         (201, 211),
     ),
 }
+
+raw_dataset = {}
+preprocessed_dataset = {}
+
+def readDataset (s=2,speed="medium") -> None:
+    if s > 10:
+        s = str(s)
+    elif s < 10:
+        s = "0" + str(s)
+    path = os.getcwd() + "\\xml_logs\\s" + s + "\\" + speed
+    list_of_files = os.listdir(path)
+
+    for file_name in list_of_files:
+        file = open(file_name, 'r')
+        file_data = BeautifulSoup(file.read(),'xml')
+        print(file_data)
+        #Work in progress
+        
+        
+

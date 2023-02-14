@@ -2,13 +2,13 @@
 
 import math
 from collections import defaultdict
-from stored_gestures import raw_gesture_templates
+import stored_gestures
 
 class DollarRecognizer:
     N_RESAMPLE_POINTS = 64
     SIZE = 250
 
-    def __init__(self, points) -> None:
+    def __init__(self, points, live=True, read=False) -> None:
         """
         Initializes the DollarRecognizer class by setting class variables and calling the processTemplates method
         
@@ -16,10 +16,16 @@ class DollarRecognizer:
         ----------
             points: list of points in the format [(x, y), ...]
         """
-        self.raw_gesture_templates = raw_gesture_templates
-        self.preprocessed_gesture_templates = defaultdict(list) # hashmap of with key = gesture name and value = list of templates
-        self.points = points
-        self.processTemplates()
+        if live:
+            self.raw_gesture_templates = stored_gestures.default_raw_gesture_templates
+            self.preprocessed_gesture_templates = defaultdict(list) # hashmap of with key = gesture name and value = list of templates
+            self.points = points
+            self.processTemplates()
+        else:
+            self.raw_gesture_templates = defaultdict(list) # hashmap of with key = gesture name and value = list of templates
+            self.preprocessed_gesture_templates = defaultdict(list) # hashmap of with key = gesture name and value = list of templates
+            self.points = points
+
         
     def processTemplates(self) -> None:
         """
@@ -308,6 +314,6 @@ class DollarRecognizer:
         return (gesture, score)
 
 if __name__ == "__main__":
-    triangle_test = raw_gesture_templates["triangle"]
+    triangle_test = stored_gestures.default_raw_gesture_templates["triangle"]
     triangle_recognizer = DollarRecognizer(triangle_test)
     print(triangle_recognizer.recognize(250))
