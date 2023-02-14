@@ -1,3 +1,14 @@
+preprocessed_dataset = {} # contains preprocessed gesture data obtained from xml_logs
+""" Format:
+{ User (int, 1-12) : 
+    { Instance (int, 1-10) :
+        defaultdict (class 'dict>, { Gesture_Name (str) : List_of_points })
+    }
+}
+For example, to access the processed list of points for the 2nd Triangle gesture that User 1 drew, use:
+    stored_gestures.preprocessed_dataset[1][2]["triangle"]
+"""
+
 default_raw_gesture_templates = {  # contains the same 16 raw templates found on the $1 website (https://depts.washington.edu/acelab/proj/dollar/dollar.js)
     "triangle": (
         (137, 139),
@@ -966,5 +977,3 @@ default_raw_gesture_templates = {  # contains the same 16 raw templates found on
         (201, 211),
     ),
 }
-
-preprocessed_dataset = {}

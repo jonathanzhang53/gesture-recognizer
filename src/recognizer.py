@@ -16,28 +16,34 @@ class DollarRecognizer:
         parameters:
         ----------
             points: list of points in the format [(x, y), ...]
+            live: indicates whether online/offline. If offline, read and process XML data.
         """
-        if live:
+        if not live:
             self.raw_gesture_templates = stored_gestures.default_raw_gesture_templates
-            self.preprocessed_gesture_templates = defaultdict(list) # hashmap of with key = gesture name and value = list of templates
-            self.points = points
-            self.processTemplates()
-        else:
-            self.raw_gesture_templates = stored_gestures.default_raw_gesture_templates
-            self.preprocessed_gesture_templates = defaultdict(list) # hashmap of with key = gesture name and value = list of templates
-            self.points = points
-            self.readDataset()
+            self.preprocessed_gesture_templates = defaultdict(dict)
+            self.readXMLDataset()
+        self.raw_gesture_templates = stored_gestures.default_raw_gesture_templates
+        self.preprocessed_gesture_templates = defaultdict(list) # hashmap of with key = gesture name and value = list of templates
+        self.points = points
+        self.processTemplates()
 
-    def readDataset(self,speed="medium") -> dict:
-        print("Reading and processing xml_logs. This may take a while.")
+    def readXMLDataset(self,speed="medium") -> None:
+        """
+        Populates stored_gestures.preprocessed_dataset with the data that is contained in the xml_logs
+        
+        parameters:
+        ----------
+            speed: specifies which speed type of data is to be read. Use "slow", "medium", or "fast".
+        """
+        self.preprocessed_gesture_templates.clear()
+        print("Reading and processing xml_logs. This may take a minute.")
         for s in range(1,12):
-            self.preprocessed_gesture_templates.clear()
             dataset_subset = {}
             if s >= 10:
                 s = str(s)
             elif s < 10:
                 s = "0" + str(s)
-            print(s + " of 11")
+            print("\tProcessing user " + s + " of 11")
             path = os.getcwd() + "\\xml_logs\\s" + s + "\\" + speed
             list_of_files = os.listdir(path)
             for i in range(1,11):
@@ -54,21 +60,25 @@ class DollarRecognizer:
                     self.points = ()
                     file = open(path+"\\"+file_name, 'r')
                     file_XML_data = BeautifulSoup(file.read(),'lxml')
-                    header_XML = file_XML_data.find('gesture')
-                    gesture_name = header_XML["name"]
                     all_points_XML = file_XML_data.find_all('point')
                     for point_XML in all_points_XML:
                         self.points += (int(point_XML["x"]),int(point_XML["y"]))
-                self.processTemplates()
+                self.processTemplates(read=True)
                 dataset_subset[int(i)] = self.preprocessed_gesture_templates
             stored_gestures.preprocessed_dataset[int(s)] = dataset_subset
-        text_file = open("preprocessed_data.txt","w")
+        print("Done.")
+        # Uncomment the below lines to inspect the contents of stored_gestures.preprocessed_dataset
+        """text_file = open("processed_data.txt","w")
         text_file.write(str(stored_gestures.preprocessed_dataset))
-        text_file.close()
+        text_file.close()"""
 
-    def processTemplates(self) -> None:
+    def processTemplates(self, read=False) -> None:
         """
         Preprocesses the raw gesture templates and saves them to a file
+
+        parameters:
+        ----------
+            read: if reading xml_logs, add points to defaultdict(dict) structure instead of defaultdict(list).
         """
         for templateName, templatePoints in self.raw_gesture_templates.items():
             self.points = list(templatePoints)
@@ -77,7 +87,10 @@ class DollarRecognizer:
             self.points = self.rotate_by(omega)
             self.points = self.scale_to(self.SIZE)
             self.points = self.translate_to((0, 0))
-            self.preprocessed_gesture_templates[templateName].append(self.points)
+            if read:
+                self.preprocessed_gesture_templates[templateName] = self.points
+            else:
+                self.preprocessed_gesture_templates[templateName].append(self.points)
 
             # TODO: save preprocessed_gesture_templates to a file
             # with open("preprocessed_gestures.json", "w") as f:
