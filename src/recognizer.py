@@ -66,7 +66,7 @@ class DollarRecognizer:
                 self.processTemplates(read=True)
                 dataset_subset[int(i)] = self.preprocessed_gesture_templates
             stored_gestures.preprocessed_dataset[int(s)] = dataset_subset
-        print("Done.")
+        print("Done reading xml_logs.")
         # Uncomment the below lines to inspect the contents of stored_gestures.preprocessed_dataset
         """text_file = open("processed_data.txt","w")
         text_file.write(str(stored_gestures.preprocessed_dataset))
