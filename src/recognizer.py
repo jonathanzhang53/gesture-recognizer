@@ -37,7 +37,7 @@ class DollarRecognizer:
         """
         self.preprocessed_gesture_templates.clear()
         print("Reading and processing xml_logs. This may take a minute.")
-        for s in range(1,12):
+        for s in range(2,12):
             dataset_subset = {}
             if s >= 10:
                 s = str(s)
