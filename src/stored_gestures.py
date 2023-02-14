@@ -968,6 +968,3 @@ default_raw_gesture_templates = {  # contains the same 16 raw templates found on
 }
 
 preprocessed_dataset = {}
-        
-        
-

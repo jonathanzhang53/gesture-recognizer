@@ -9,7 +9,7 @@ class DollarRecognizer:
     N_RESAMPLE_POINTS = 64
     SIZE = 250
 
-    def __init__(self, points, live=True, read=False) -> None:
+    def __init__(self, points, live=True) -> None:
         """
         Initializes the DollarRecognizer class by setting class variables and calling the processTemplates method
         
@@ -29,13 +29,15 @@ class DollarRecognizer:
             self.readDataset()
 
     def readDataset(self,speed="medium") -> dict:
-        for s in range(1,11):
+        print("Reading and processing xml_logs. This may take a while.")
+        for s in range(1,12):
+            self.preprocessed_gesture_templates.clear()
             dataset_subset = {}
-            print(s)
             if s >= 10:
                 s = str(s)
             elif s < 10:
                 s = "0" + str(s)
+            print(s + " of 11")
             path = os.getcwd() + "\\xml_logs\\s" + s + "\\" + speed
             list_of_files = os.listdir(path)
             for i in range(1,11):
@@ -49,17 +51,20 @@ class DollarRecognizer:
                     if file_name.find(s) != -1:
                         file_set.append(file_name)
                 for file_name in file_set:
-                    self.points = []
+                    self.points = ()
                     file = open(path+"\\"+file_name, 'r')
                     file_XML_data = BeautifulSoup(file.read(),'lxml')
                     header_XML = file_XML_data.find('gesture')
                     gesture_name = header_XML["name"]
                     all_points_XML = file_XML_data.find_all('point')
                     for point_XML in all_points_XML:
-                        self.points.append((int(point_XML["x"]),int(point_XML["y"])))
+                        self.points += (int(point_XML["x"]),int(point_XML["y"]))
                 self.processTemplates()
                 dataset_subset[int(i)] = self.preprocessed_gesture_templates
             stored_gestures.preprocessed_dataset[int(s)] = dataset_subset
+        text_file = open("preprocessed_data.txt","w")
+        text_file.write(str(stored_gestures.preprocessed_dataset))
+        text_file.close()
 
     def processTemplates(self) -> None:
         """
