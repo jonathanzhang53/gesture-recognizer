@@ -71,6 +71,27 @@ class DollarRecognizer:
         """text_file = open("processed_data.txt","w")
         text_file.write(str(stored_gestures.preprocessed_dataset))
         text_file.close()"""
+    
+    def setTrainingSet(self, training_set) -> None:
+        """
+        Adds the list of points to the recognizer's training set.
+
+        parameters:
+        ----------
+            training_set: map of training set of type {gesture : [points]}
+        """
+        for gesture, points in training_set:
+            self.preprocessed_gesture_templates[gesture] = points
+
+    def clearTrainingSet(self) -> None:
+        """
+        Clears the recognizer's training set.
+
+        parameters:
+        ----------
+            points: preprocessed list of points to add.
+        """
+        self.preprocessed_gesture_templates.clear()
 
     def processTemplates(self, read=False) -> None:
         """
