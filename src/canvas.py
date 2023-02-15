@@ -10,9 +10,7 @@ class Canvas:
 
     N_RESAMPLE_POINTS = 64
 
-    def __init__(self, live=True):
-        # indicates if online or offline
-        self.live = live
+    def __init__(self):
 
         # location of last drawn point
         self.last_x = None
@@ -27,7 +25,7 @@ class Canvas:
         self.canvas = tk.Canvas(self.root, width=300, height=200)
 
         # initialize DollarRecognizer
-        self.dollar_recognizer = DollarRecognizer(self.raw_input_points, live)
+        self.dollar_recognizer = DollarRecognizer(self.raw_input_points, True)
 
     def run(self):
         """Run the canvas."""
