@@ -70,6 +70,7 @@ if __name__ == "__main__":
                             this_template = possible_template.pop(
                                 random.randint(0, len(possible_template) - 1)
                             )
+                            #stored_gestures.preprocessed_datasetp[user][randomint]["gesture"]
                             templates[gesture].append(this_template)
 
                             # choose 1 candidate from remaining templates

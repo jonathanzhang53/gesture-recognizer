@@ -4,6 +4,7 @@ import math, os
 from collections import defaultdict
 import stored_gestures
 from bs4 import BeautifulSoup
+import pickle
 
 class DollarRecognizer:
     N_RESAMPLE_POINTS = 64
@@ -35,42 +36,50 @@ class DollarRecognizer:
         ----------
             speed: specifies which speed type of data is to be read. Use "slow", "medium", or "fast".
         """
-        self.preprocessed_gesture_templates.clear()
-        print("Reading and processing xml_logs. This may take a minute.")
-        for s in range(2,12):
-            dataset_subset = {}
-            if s >= 10:
-                s = str(s)
-            elif s < 10:
-                s = "0" + str(s)
-            print("\tProcessing user " + s + " of 11")
-            path = os.getcwd() + "\\xml_logs\\s" + s + "\\" + speed
-            list_of_files = os.listdir(path)
-            for i in range(1,11):
-                if i >= 10:
-                    i = str(i)
-                elif i < 10:
-                    i = "0" + str(i)
-                self.preprocessed_gesture_templates.clear()
-                file_set = []
-                for file_name in list_of_files:
-                    if file_name.find(s) != -1:
-                        file_set.append(file_name)
-                for file_name in file_set:
-                    self.points = ()
-                    file = open(path+"\\"+file_name, 'r')
-                    file_XML_data = BeautifulSoup(file.read(),'lxml')
-                    all_points_XML = file_XML_data.find_all('point')
-                    for point_XML in all_points_XML:
-                        self.points += (int(point_XML["x"]),int(point_XML["y"]))
-                self.processTemplates(read=True)
-                dataset_subset[int(i)] = self.preprocessed_gesture_templates
-            stored_gestures.preprocessed_dataset[int(s)] = dataset_subset
-        print("Done reading xml_logs.")
-        # Uncomment the below lines to inspect the contents of stored_gestures.preprocessed_dataset
-        """text_file = open("processed_data.txt","w")
-        text_file.write(str(stored_gestures.preprocessed_dataset))
-        text_file.close()"""
+        if not os.path.exists("pickled_processed_data.txt"): # If the pickled data doesn't exist, read the xml_logs and pickle it
+            self.preprocessed_gesture_templates.clear()
+            print("No pickled_processed_data.txt found, reading and processing xml_logs. This may take a minute.")
+            for s in range(2,12): 
+                dataset_subset = {}
+                if s >= 10:
+                    s = str(s)
+                elif s < 10:
+                    s = "0" + str(s)
+                print("\tProcessing user " + s + " of 11")
+                path = os.getcwd() + "\\xml_logs\\s" + s + "\\" + speed
+                list_of_files = os.listdir(path)
+                for i in range(1,11):
+                    if i >= 10:
+                        i = str(i)
+                    elif i < 10:
+                        i = "0" + str(i)
+                    self.preprocessed_gesture_templates.clear()
+                    file_set = []
+                    for file_name in list_of_files:
+                        if file_name.find(s) != -1:
+                            file_set.append(file_name)
+                    for file_name in file_set:
+                        self.points = ()
+                        file = open(path+"\\"+file_name, 'r')
+                        file_XML_data = BeautifulSoup(file.read(),'lxml')
+                        all_points_XML = file_XML_data.find_all('point')
+                        for point_XML in all_points_XML:
+                            self.points += (int(point_XML["x"]),int(point_XML["y"]))
+                    self.processTemplates(read=True)
+                    dataset_subset[int(i)] = self.preprocessed_gesture_templates
+                stored_gestures.preprocessed_dataset[int(s)] = dataset_subset
+            print("Done reading xml_logs.")
+            # Uncomment the below lines to inspect the contents of stored_gestures.preprocessed_dataset
+            """text_file = open("processed_data.txt","w")
+            text_file.write(str(stored_gestures.preprocessed_dataset))
+            text_file.close()"""
+            test_file_2 = open("pickled_processed_data.txt", "wb")
+            pickle.dump(stored_gestures.preprocessed_dataset,test_file_2)
+            test_file_2.close()
+        test_file_3 = open("pickled_processed_data.txt", "rb")
+        testing_preprocessed_dataset = pickle.load(test_file_3)
+        test_file_3.close()
+        print(testing_preprocessed_dataset == stored_gestures.preprocessed_dataset)
     
     def setTrainingSet(self, training_set) -> None:
         """
