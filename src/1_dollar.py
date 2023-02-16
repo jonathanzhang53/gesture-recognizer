@@ -46,12 +46,14 @@ if __name__ == "__main__":
         #                   increment recognition score for each U,G by 1
         #       recognition score for each U,G /= 100
         # print final average per-user accuracy
-        
+        user_recognition_scores = []
         # loop through each user, gathering recognition scores for 100 tests each involving 1 to 9 templates (900 tests x 16 gestures per user)
         for user in range(2, 12):
             for E in range(1, 10):
+                # user recognition score for each example E
+                user_recognition_score = 0
                 for i in range(100):
-                    recognizer = DollarRecognizer([], False) # Initialize recognizer in offline mode.
+                    recognizer = DollarRecognizer(points=[], live=False) # Initialize recognizer in offline mode.
                     templates = defaultdict(list)
                     # key: gesture_name
                         # value: [template_1, template_2, ...]
@@ -71,14 +73,17 @@ if __name__ == "__main__":
                             candidates[gesture] = this_candidate
                     for candidate_name, candidate_points in candidates.items():
                         # TODO: process all templates stored in templates for each gesture
-
                         # recognize candidate with E chosen templates
                         recognizer.points = candidate_points
                         gesture_name, score = recognizer.run()
 
                         if gesture_name == candidate_name:
-                            # TODO: increment recognition score for each U,G by 1
-                            pass
-                
-                # TODO: recognition score for each U,G /= 100
-        # TODO: print final average per-user accuracy
+                            # increment recognition score for each user, gesture by 1
+                            user_recognition_score += 1
+                    # add recognition score for each user, gesture to user_recognition_scores
+                    user_recognition_scores.append(user_recognition_score)
+                # recognition score for each U,G /= 100
+                user_recognition_scores = [score / 100 for score in user_recognition_scores]
+        # print final average per-user accuracy
+        for score in user_recognition_scores:
+            print(score)
