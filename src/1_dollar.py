@@ -46,7 +46,6 @@ if __name__ == "__main__":
         #                   increment recognition score for each U,G by 1
         #       recognition score for each U,G /= 100
         # print final average per-user accuracy
-        user_recognition_scores = []
         # loop through each user, gathering recognition scores for 100 tests each involving 1 to 9 templates (900 tests x 16 gestures per user)
         for user in range(2, 12):
             for E in range(1, 10):
