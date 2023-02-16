@@ -51,6 +51,7 @@ if __name__ == "__main__":
             for E in range(1, 10):
                 # user recognition score for each example E
                 user_recognition_score = 0
+                user_recognition_scores = []
                 for i in range(100):
                     recognizer = DollarRecognizer(
                         points=[], live=False
