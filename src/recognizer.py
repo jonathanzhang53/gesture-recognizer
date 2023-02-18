@@ -1,10 +1,12 @@
 # WRITTEN BY Katherine Chan, Thomas Ruby, Jonathan Zhang
 
-import math, os
-from collections import defaultdict
-import stored_gestures
 from bs4 import BeautifulSoup
+from collections import defaultdict
+import math
+import os
 import pickle
+
+import stored_gestures
 
 class DollarRecognizer:
     N_RESAMPLE_POINTS = 64
@@ -23,6 +25,7 @@ class DollarRecognizer:
             self.raw_gesture_templates = stored_gestures.default_raw_gesture_templates
             self.preprocessed_gesture_templates = defaultdict(dict)
             self.readXMLDataset()
+
         self.raw_gesture_templates = stored_gestures.default_raw_gesture_templates
         self.preprocessed_gesture_templates = defaultdict(list) # hashmap of with key = gesture name and value = list of templates
         self.points = points
@@ -36,47 +39,58 @@ class DollarRecognizer:
         ----------
             speed: specifies which speed type of data is to be read. Use "slow", "medium", or "fast".
         """
-        if not os.path.exists("pickled_processed_data.txt"): # If the pickled data doesn't exist, read the xml_logs and pickle it
+        if not os.path.exists("pickled_processed_data.obj"): # if the pickled data doesn"t exist, read the xml_logs and pickle it
             self.preprocessed_gesture_templates.clear()
-            print("No pickled_processed_data.txt found, reading and processing xml_logs. This may take a minute.")
-            for s in range(2,12): 
-                dataset_subset = {}
+
+            print("No pickled_processed_data.obj found, reading and processing xml_logs. This may take a minute.")
+
+            for s in range(2,12):
                 if s >= 10:
                     s = str(s)
                 elif s < 10:
                     s = "0" + str(s)
+
                 print("\tProcessing user " + s + " of 11")
+
                 path = os.getcwd() + "\\xml_logs\\s" + s + "\\" + speed
                 list_of_files = os.listdir(path)
                 self.preprocessed_gesture_templates.clear()
+
                 for file_name in list_of_files:
                     self.points = []
-                    file = open(path+"\\"+file_name, 'r')
-                    file_XML_data = BeautifulSoup(file.read(),'lxml')
-                    all_points_XML = file_XML_data.find_all('point')
+                    file = open(path + "\\" + file_name, "r")
+                    file_XML_data = BeautifulSoup(file.read(), "lxml")
+                    all_points_XML = file_XML_data.find_all("point")
+
                     for point_XML in all_points_XML:
-                        self.points.append((int(point_XML["x"]),int(point_XML["y"])))
-                    header = file_XML_data.find('gesture')
-                    gesture_name = header['name']
+                        self.points.append((int(point_XML["x"]), int(point_XML["y"])))
+                    
+                    header = file_XML_data.find("gesture")
+                    gesture_name = header["name"]
                     self.raw_gesture_templates[gesture_name] = self.points
+
                 self.processTemplates(read=True)
                 stored_gestures.preprocessed_dataset[int(s)] = self.preprocessed_gesture_templates
+
             print("Done reading xml_logs.")
-            # Uncomment the below lines to inspect the contents of stored_gestures.preprocessed_dataset
-            """text_file = open("processed_data.txt","w")
-            text_file.write(str(stored_gestures.preprocessed_dataset))
-            text_file.close()"""
-            text_file_2 = open("pickled_processed_data.txt", "wb")
+
+            # uncomment the below lines to inspect the contents of stored_gestures.preprocessed_dataset
+            # text_file = open("processed_data.txt","w")
+            # text_file.write(str(stored_gestures.preprocessed_dataset))
+            # text_file.close()
+
+            text_file_2 = open("pickled_processed_data.obj", "wb")
             pickle.dump(stored_gestures.preprocessed_dataset,text_file_2)
             text_file_2.close()
-        text_file_3 = open("pickled_processed_data.txt", "rb")
+
+        text_file_3 = open("pickled_processed_data.obj", "rb")
         testing_preprocessed_dataset = pickle.load(text_file_3)
         text_file_3.close()
         stored_gestures.preprocessed_dataset = testing_preprocessed_dataset
     
     def setOfflineTrainingSet(self, training_set) -> None:
         """
-        Adds the map of gesture and points to the recognizer's training set.
+        Adds the map of gesture and points to the recognizer"s training set.
 
         parameters:
         ----------
@@ -87,7 +101,7 @@ class DollarRecognizer:
 
     def clearTrainingSet(self) -> None:
         """
-        Clears the recognizer's training set.
+        Clears the recognizer"s training set.
 
         parameters:
         ----------
@@ -110,15 +124,11 @@ class DollarRecognizer:
             self.points = self.rotate_by(omega)
             self.points = self.scale_to(self.SIZE)
             self.points = self.translate_to((0, 0))
+
             if read:
                 self.preprocessed_gesture_templates[templateName] = self.points
             else:
                 self.preprocessed_gesture_templates[templateName].append(self.points)
-
-            # TODO: save preprocessed_gesture_templates to a file
-            # with open("preprocessed_gestures.json", "w") as f:
-            #     body = {templateName: self.points}
-            #     json.dump(body, f)
     
     def path_length(self) -> float:
         """
@@ -298,12 +308,15 @@ class DollarRecognizer:
 
         for tName, tPoints in self.preprocessed_gesture_templates.items():
             d = self.distance_at_best_angle(tPoints[0], -45, 45, 2)
-            N_Best_List.append((tName, 1 - (d / (0.5 * math.sqrt(size**2 + size**2)))))
+            N_Best_List.append((tName, 1 - (d / (0.5 * math.sqrt(size ** 2 + size ** 2)))))
+
             if d < b:
                 b = d
                 gesture = tName
-        score = 1 - (b / (0.5 * math.sqrt(size**2 + size**2)))
+
+        score = 1 - (b / (0.5 * math.sqrt(size ** 2 + size ** 2)))
         N_Best_List.sort(key=lambda x: x[1], reverse=True)
+
         return (gesture, score, N_Best_List)
 
     def distance_at_best_angle(
@@ -328,6 +341,7 @@ class DollarRecognizer:
         f1 = self.distance_at_angle(t, x1)
         x2 = (1 - phi) * thetaA + phi * thetaB
         f2 = self.distance_at_angle(t, x2)
+
         while abs(thetaB - thetaA) > thetaDelta:
             if f1 < f2:
                 thetaB = x2
@@ -341,6 +355,7 @@ class DollarRecognizer:
                 f1 = f2
                 x2 = (1 - phi) * thetaA + phi * thetaB
                 f2 = self.distance_at_angle(t, x2)
+
         return min(f1, f2)
 
     def distance_at_angle(self, t: list, theta: float) -> float:
@@ -375,9 +390,11 @@ class DollarRecognizer:
             the average distance between and b as a float
         """
         d = 0
+
         for i in range(min(len(a), len(b))):
             # calculate the distance between points a and b and add to d
             d += math.sqrt((a[i][0] - b[i][0]) ** 2 + (a[i][1] - b[i][1]) ** 2)
+            
         return d / len(a)
     
     def run(self) -> tuple:
@@ -390,7 +407,7 @@ class DollarRecognizer:
 
         return (gesture, score, N_best_list)
 
-if __name__ == "__main__":
-    triangle_test = stored_gestures.default_raw_gesture_templates["triangle"]
-    triangle_recognizer = DollarRecognizer(triangle_test)
-    print(triangle_recognizer.recognize(250))
+# if __name__ == "__main__":
+#     triangle_test = stored_gestures.default_raw_gesture_templates["triangle"]
+#     triangle_recognizer = DollarRecognizer(triangle_test)
+#     print(triangle_recognizer.recognize(250))
