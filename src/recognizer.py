@@ -386,9 +386,9 @@ class DollarRecognizer:
         self.points = self.rotate_by(omega)
         self.points = self.scale_to(self.SIZE)
         self.points = self.translate_to((0, 0))
-        gesture, score = self.recognize(self.SIZE)
+        gesture, score, N_best_list = self.recognize(self.SIZE)
 
-        return (gesture, score)
+        return (gesture, score, N_best_list)
 
 if __name__ == "__main__":
     triangle_test = stored_gestures.default_raw_gesture_templates["triangle"]
