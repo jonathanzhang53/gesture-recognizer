@@ -58,7 +58,7 @@ class DollarRecognizer:
 
                 for file_name in list_of_files:
                     self.points = []
-                    file = open(path + "\\" + file_name, "r")
+                    file = open(path + "\\" + file_name, "r", encoding="UTF-8")
                     file_XML_data = BeautifulSoup(file.read(), "lxml")
                     all_points_XML = file_XML_data.find_all("point")
 

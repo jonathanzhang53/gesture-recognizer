@@ -51,7 +51,7 @@ if __name__ == "__main__":
         # print final average per-user accuracy
         # loop through each user, gathering recognition scores for 100 tests each involving 1 to 9 templates (900 tests x 16 gestures per user)
 
-        file = open("Recognition Log.csv", "w", newline="") # open csv file for logging results
+        file = open("recognition_log.csv", "w", newline="", encoding="UTF-8") # open csv file for logging results
         log = csv.writer(file) 
         log.writerow(["Recognition Log: Katherine Chan, Thomas Ruby, Jonathan Zhang // $1 Recognizer // XML Dataset // USER-DEPENDENT RANDOM-" + str(OFFLINE_I)])
         log.writerow([
@@ -137,7 +137,7 @@ if __name__ == "__main__":
                             log.writerow([user, candidate_name[:-2], i + 1, E, len(templates), templates.keys(), candidate_name, gesture_name[:-2], 1, score, gesture_name, N_best_list[:50]])
                         else:
                             print("\t\t\t\t--Incorrectly recognized " + candidate_name + " as " + gesture_name + ".")
-                            
+
                             # add to log
                             log.writerow([user, candidate_name[:-2], i + 1, E, len(templates), templates.keys(), candidate_name, gesture_name[:-2], 0, score, gesture_name, N_best_list[:50]])
                 
@@ -159,4 +159,4 @@ if __name__ == "__main__":
         log.writerow("")
         file.close()
 
-        print("See Recognition Log.csv for results.")   
+        print("See recognition_log.csv for results.")   
