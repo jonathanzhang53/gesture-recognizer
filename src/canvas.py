@@ -11,6 +11,7 @@ class Canvas:
     N_RESAMPLE_POINTS = 64
 
     def __init__(self):
+
         # location of last drawn point
         self.last_x = None
         self.last_y = None
@@ -24,7 +25,7 @@ class Canvas:
         self.canvas = tk.Canvas(self.root, width=300, height=200)
 
         # initialize DollarRecognizer
-        self.dollar_recognizer = DollarRecognizer(self.raw_input_points)
+        self.dollar_recognizer = DollarRecognizer(self.raw_input_points, True)
 
     def run(self):
         """Run the canvas."""
@@ -54,7 +55,7 @@ class Canvas:
         self.last_x = None
         self.last_y = None
         self.dollar_recognizer.points = self.raw_input_points
-        name_of_gesture, gesture_score = (self.dollar_recognizer.run())
+        name_of_gesture, gesture_score, N_best_list = (self.dollar_recognizer.run())
         self.text.delete("1.0", "end")
         self.text.insert("1.0", "Result: " + name_of_gesture + ", Score: " + str(gesture_score)[0:5])
 

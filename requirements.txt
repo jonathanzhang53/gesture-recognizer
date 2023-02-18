@@ -1,1 +1,3 @@
 pylint
+bs4
+lxml
