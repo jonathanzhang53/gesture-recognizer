@@ -49,7 +49,7 @@ if __name__ == "__main__":
         #       recognition score for each U,G /= 100
         # print final average per-user accuracy
         # loop through each user, gathering recognition scores for 100 tests each involving 1 to 9 templates (900 tests x 16 gestures per user)
-        file = open("Recognition Log.csv", "w", newline="")
+        file = open("Recognition Log.csv", "w", newline="") #open csv file for logging results
         log = csv.writer(file) 
         log.writerow(["Recognition Log: Katherine Chan, Thomas Ruby, Jonathan Zhang // $1 Recognizer // XML Dataset // USER-DEPENDENT RANDOM-"+str(OFFLINE_I)])
         log.writerow(["User", "Gesture Type", "Random Iteration[1 to "+str(OFFLINE_I)+"]", "#ofTrainingExamples[E]", "TotalSizeOfTrainingSet", "TrainingSetContents","Candidate","RecoResultGestureType[what-was-recognized]","CorrectIncorrect[1or0]","RecoResultScore", "RecoResultBestMatch[specific-instance]","RecoResultNBestSorted[instance-and-score]"])
@@ -64,7 +64,7 @@ if __name__ == "__main__":
             user_recognition_scores = [] # user recognition score for each example E
             print("\tUser " + str(user) + " of 11.")
             if time_last != 0: # print estimated time remaining
-                print("\tEstimated time remaining: " + str(int((time_current - time_last) * (11 - user)/60)) + " minutes " + str(int((time_current - time_last) * (11 - user)%60)) + " seconds.")
+                print("\tEstimated time remaining: " + str(int((time_current - time_last) * (12 - user)/60)) + " minutes " + str(int((time_current - time_last) * (12 - user)%60)) + " seconds.")
             for E in range(1, 10):
                 print("\t\tE = " + str(E) + " of 9.  ", end="\n")
                 user_recognition_score = 0
@@ -118,8 +118,8 @@ if __name__ == "__main__":
                 print("\t\t\t\t"+str(user_recognition_score)+ " of " + str(OFFLINE_I*16) +  " gestures (" + (str(100*(user_recognition_score/(OFFLINE_I*16)))[:5]) + "%) recognized correctly for E = " + str(E) + ".")
                 # add the recognition score for this E of this user
                 user_recognition_scores.append(user_recognition_score)
-                # recognition score for each U,G /= 100
 
+            # recognition score for each U,G /= 100
             user_recognition_scores = [
                 score / OFFLINE_I for score in user_recognition_scores
             ]
