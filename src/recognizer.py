@@ -48,48 +48,41 @@ class DollarRecognizer:
                 print("\tProcessing user " + s + " of 11")
                 path = os.getcwd() + "\\xml_logs\\s" + s + "\\" + speed
                 list_of_files = os.listdir(path)
-                for i in range(1,11):
-                    if i >= 10:
-                        i = str(i)
-                    elif i < 10:
-                        i = "0" + str(i)
-                    self.preprocessed_gesture_templates.clear()
-                    file_set = []
-                    for file_name in list_of_files:
-                        if file_name.find(s) != -1:
-                            file_set.append(file_name)
-                    for file_name in file_set:
-                        self.points = ()
-                        file = open(path+"\\"+file_name, 'r')
-                        file_XML_data = BeautifulSoup(file.read(),'lxml')
-                        all_points_XML = file_XML_data.find_all('point')
-                        for point_XML in all_points_XML:
-                            self.points += (int(point_XML["x"]),int(point_XML["y"]))
-                    self.processTemplates(read=True)
-                    dataset_subset[int(i)] = self.preprocessed_gesture_templates
-                stored_gestures.preprocessed_dataset[int(s)] = dataset_subset
+                self.preprocessed_gesture_templates.clear()
+                for file_name in list_of_files:
+                    self.points = []
+                    file = open(path+"\\"+file_name, 'r')
+                    file_XML_data = BeautifulSoup(file.read(),'lxml')
+                    all_points_XML = file_XML_data.find_all('point')
+                    for point_XML in all_points_XML:
+                        self.points.append((int(point_XML["x"]),int(point_XML["y"])))
+                    header = file_XML_data.find('gesture')
+                    gesture_name = header['name']
+                    self.raw_gesture_templates[gesture_name] = self.points
+                self.processTemplates(read=True)
+                stored_gestures.preprocessed_dataset[int(s)] = self.preprocessed_gesture_templates
             print("Done reading xml_logs.")
             # Uncomment the below lines to inspect the contents of stored_gestures.preprocessed_dataset
             """text_file = open("processed_data.txt","w")
             text_file.write(str(stored_gestures.preprocessed_dataset))
             text_file.close()"""
-            test_file_2 = open("pickled_processed_data.txt", "wb")
-            pickle.dump(stored_gestures.preprocessed_dataset,test_file_2)
-            test_file_2.close()
-        test_file_3 = open("pickled_processed_data.txt", "rb")
-        testing_preprocessed_dataset = pickle.load(test_file_3)
-        test_file_3.close()
-        print(testing_preprocessed_dataset == stored_gestures.preprocessed_dataset)
+            text_file_2 = open("pickled_processed_data.txt", "wb")
+            pickle.dump(stored_gestures.preprocessed_dataset,text_file_2)
+            text_file_2.close()
+        text_file_3 = open("pickled_processed_data.txt", "rb")
+        testing_preprocessed_dataset = pickle.load(text_file_3)
+        text_file_3.close()
+        stored_gestures.preprocessed_dataset = testing_preprocessed_dataset
     
-    def setTrainingSet(self, training_set) -> None:
+    def setOfflineTrainingSet(self, training_set) -> None:
         """
-        Adds the list of points to the recognizer's training set.
+        Adds the map of gesture and points to the recognizer's training set.
 
         parameters:
         ----------
             training_set: map of training set of type {gesture : [points]}
         """
-        for gesture, points in training_set:
+        for gesture, points in training_set.items():
             self.preprocessed_gesture_templates[gesture] = points
 
     def clearTrainingSet(self) -> None:
@@ -297,19 +290,21 @@ class DollarRecognizer:
 
         Returns:
         ----------
-            a tuple containing (gesture, score)
+            a tuple containing (gesture, score, N_Best_List)
         """
         b = float("inf")
         gesture = ""
+        N_Best_List = []
 
         for tName, tPoints in self.preprocessed_gesture_templates.items():
             d = self.distance_at_best_angle(tPoints[0], -45, 45, 2)
+            N_Best_List.append((tName, 1 - (d / (0.5 * math.sqrt(size**2 + size**2)))))
             if d < b:
                 b = d
                 gesture = tName
         score = 1 - (b / (0.5 * math.sqrt(size**2 + size**2)))
-        print(gesture)
-        return (gesture, score)
+        N_Best_List.sort(key=lambda x: x[1], reverse=True)
+        return (gesture, score, N_Best_List)
 
     def distance_at_best_angle(
         self, t: list, thetaA: float | int, thetaB: float | int, thetaDelta: float | int
