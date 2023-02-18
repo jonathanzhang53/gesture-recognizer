@@ -59,6 +59,7 @@ if __name__ == "__main__":
                         points=[], live=False
                     )  # Initialize recognizer in offline mode.
         time_last = 0 # for estimated time remaining
+        user_accuracies = [] #average recognition percentages for each user
         for user in range(2, 12):
             time_current = time.time() # for estimated time remaining
             user_recognition_scores = [] # user recognition score for each example E
@@ -127,7 +128,10 @@ if __name__ == "__main__":
             log.writerow(["TotalAvgAccuracy[User=" + str(user) + "]",(sum(user_recognition_scores)/len(user_recognition_scores))/len(gestures)])
             log.writerow("")
             log.writerow("")
+            user_accuracies.append((sum(user_recognition_scores)/len(user_recognition_scores))/len(gestures))
             time_last = time_current # for estimated time remaining
         
+        log.writerow(["TotalAvgAccuracy[AllUsers]",(sum(user_accuracies)/len(user_accuracies))])
+        log.writerow("")
         file.close()    
         print("Random 100 loop complete. See Recognition Log.csv for results.")   
