@@ -55,13 +55,13 @@ if __name__ == "__main__":
         log = csv.writer(file) 
         log.writerow(["Recognition Log: Katherine Chan, Thomas Ruby, Jonathan Zhang // $1 Recognizer // XML Dataset // USER-DEPENDENT RANDOM-" + str(OFFLINE_I)])
         log.writerow([
-            "User", 
-            "Gesture Type", 
-            "Random Iteration[1 to " + str(OFFLINE_I) + "]", 
+            "User[all-users]", 
+            "GestureType[all-gesture-types]", 
+            "Random Iteration[1to" + str(OFFLINE_I) + "]", 
             "#ofTrainingExamples[E]", 
-            "TotalSizeOfTrainingSet", 
-            "TrainingSetContents", 
-            "Candidate", 
+            "TotalSizeOfTrainingSet[count]", 
+            "TrainingSetContents[specific-gesture-instances]", 
+            "Candidate[specific-instance]", 
             "RecoResultGestureType[what-was-recognized]", 
             "CorrectIncorrect[1or0]", 
             "RecoResultScore", 
@@ -69,7 +69,7 @@ if __name__ == "__main__":
             "RecoResultNBestSorted[instance-and-score]"
         ])
         
-        print("Beginning random-100 loop with I = " + str(OFFLINE_I))
+        print("Beginning random loop with I = " + str(OFFLINE_I))
 
         recognizer = DollarRecognizer(
                         points=[], live=False
@@ -131,16 +131,17 @@ if __name__ == "__main__":
                         if score > 0.9999: # Score should never be exactly 1
                             print("WARNING! Recognizer returned a score very nearly == 1. Is a gesture in both the training and testing sets?")
                         
-                        if gesture_name[:-2] == candidate_name[:-2]:
-                            user_recognition_score += 1 # increment recognition score for each user, gesture by 1
-                            # add to log
-                            log.writerow([user, candidate_name[:-2], i + 1, E, len(templates), templates.keys(), candidate_name, gesture_name[:-2], 1, score, gesture_name, N_best_list[:50]])
-                        else:
+                        reco_result = int(gesture_name[:-2] == candidate_name[:-2])
+                        user_recognition_score += reco_result
+
+                        if reco_result == 0:
                             print("\t\t\t\t--Incorrectly recognized " + candidate_name + " as " + gesture_name + ".")
 
-                            # add to log
-                            log.writerow([user, candidate_name[:-2], i + 1, E, len(templates), templates.keys(), candidate_name, gesture_name[:-2], 0, score, gesture_name, N_best_list[:50]])
-                
+                        template_keys = "{" + str(templates.keys())[11:len(str(templates.keys())) - 2] + "}"
+
+                        # add to log
+                        log.writerow([user, candidate_name[:-2], i + 1, E, len(templates), template_keys, candidate_name, gesture_name[:-2], reco_result, score, gesture_name, N_best_list[:50]])
+
                 print("\t\t\t\t" + str(user_recognition_score) + " of " + str(OFFLINE_I * 16) + " gestures (" + (str(100 * (user_recognition_score/(OFFLINE_I * 16)))[:5]) + "%) recognized correctly for E = " + str(E) + ".")
                 
                 # add the recognition score for this E of this user
