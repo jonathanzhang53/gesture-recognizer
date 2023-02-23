@@ -31,7 +31,7 @@ class DollarRecognizer:
         self.points = points
         self.processTemplates()
 
-    def readXMLDataset(self,speed="medium") -> None:
+    def readXMLDataset(self, speed="medium") -> None:
         """
         Populates stored_gestures.preprocessed_dataset with the data that is contained in the xml_logs
         

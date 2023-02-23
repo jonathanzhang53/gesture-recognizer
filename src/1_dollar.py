@@ -8,17 +8,30 @@ import sys
 from canvas import Canvas
 from recognizer import DollarRecognizer
 
-
 def str2bool(v: str) -> bool:
     return v.lower() in ("yes", "true", "t", "1")
 
+OFFLINE_I = 10 # number of offline tests to run per user and E-level (set to 1 for demo, 10 for fast, 100 for accurate)
+NUM_USERS = 10 # number of users to test (set to 1 for demo, 10 for complete)
 
+# python3 1_dollar.py [live: boolean ("yes", "true", "t", "1")] [offline_i: int] [num_users: int]
 try:
     live = str2bool(sys.argv[1])
+    if not live:
+        try:
+            OFFLINE_I = int(sys.argv[2])
+        except:
+            print("No command line argument found for OFFLINE_I: defaulting to I = 10.")
+            OFFLINE_I = 10
+        try:
+            NUM_USERS = int(sys.argv[3])
+        except:
+            print("No command line argument found for NUM_USERS: defaulting to 1 user.")
+            NUM_USERS = 1
 except:
-    print("no command line argument found, defaulting to offline mode")
-    live = False  # True = online mode, False = offline mode.
-OFFLINE_I = 1  # number of offline tests to run per user and E-level (set to 1 for demo, 10 for fast, 100 for accurate)
+    print("No command line argument found: defaulting to offline mode.")
+    live = False # True = online mode, False = offline mode.
+
 
 if __name__ == "__main__":
     if live:
@@ -46,24 +59,9 @@ if __name__ == "__main__":
 
         print("Starting loop.")  # loop over data set
 
-        ### PSEUDOCODE
-        # for each user U = 1 to 10
-        #   for each example E = 1 to 9
-        #       for i = 1 to 100
-        #           for each gesture G in gestures
-        #               choose E templates from U,G set
-        #               choose 1 candidate from remaining templates
-        #           for each candidate T from 1 to G
-        #               recognize candidate with E chosen templates
-        #               if recognition correct
-        #                   increment recognition score for each U,G by 1
-        #       recognition score for each U,G /= 100
-        # print final average per-user accuracy
-        # loop through each user, gathering recognition scores for 100 tests each involving 1 to 9 templates (900 tests x 16 gestures per user)
-
         file = open(
             "recognition_log.csv", "w", newline="", encoding="UTF-8"
-        )  # open csv file for logging results
+        ) # open csv file for logging results
         log = csv.writer(file)
         log.writerow(
             [
@@ -92,13 +90,13 @@ if __name__ == "__main__":
 
         recognizer = DollarRecognizer(
             points=[], live=False
-        )  # initialize recognizer in offline mode
+        ) # initialize recognizer in offline mode
 
         time_last = 0
-        user_accuracies = []  # average recognition percentages for each user
-        for user in range(2, 12):
+        user_accuracies = [] # average recognition percentages for each user
+        for user in range(2, 2 + NUM_USERS):
             time_current = time.time()
-            user_recognition_scores = []  # user recognition score for each example E
+            user_recognition_scores = [] # user recognition score for each example E
 
             print("\tUser " + str(user) + " of 11.")
 
@@ -133,7 +131,7 @@ if __name__ == "__main__":
                             )
                             if (
                                 this_template < 10
-                            ):  # If user is single digit, add a 0 to the front of the string. So, a triangle is saved as "triangle01", and etc.
+                            ): # If user is single digit, add a 0 to the front of the string. So, a triangle is saved as "triangle01", and etc.
                                 templates[gesture + "0" + str(this_template)].append(
                                     stored_gestures.preprocessed_dataset[user][
                                         gesture + "0" + str(this_template)
@@ -150,9 +148,8 @@ if __name__ == "__main__":
                         this_candidate = possible_template.pop(
                             random.randint(0, len(possible_template) - 1)
                         )
-                        if (
-                            this_candidate < 10
-                        ):  # if this_candidate is single digit, add a 0 to the front of the string. So, a triangle is saved as "triangle01", and etc.
+                        if (this_candidate < 10):  
+                            # if this_candidate is single digit, add a 0 to the front of the string. So, a triangle is saved as "triangle01", and etc.
                             candidates[gesture + "0" + str(this_candidate)].append(
                                 stored_gestures.preprocessed_dataset[user][
                                     gesture + "0" + str(this_candidate)
@@ -170,14 +167,12 @@ if __name__ == "__main__":
 
                     for candidate_name, candidate_points in candidates.items():
                         # recognize candidate with E chosen templates
-                        recognizer.points = candidate_points[
-                            0
-                        ]  # (is double nested list, so we only want the first list)
+                        recognizer.points = candidate_points[0] # so we only want the first list
                         gesture_name, score, N_best_list = recognizer.recognize(
                             recognizer.SIZE
                         )
 
-                        if score > 0.9999:  # Score should never be exactly 1
+                        if score > 0.9999: # Score should never be exactly 1
                             print(
                                 "WARNING! Recognizer returned a score very nearly == 1. Is a gesture in both the training and testing sets?"
                             )
@@ -201,8 +196,7 @@ if __name__ == "__main__":
                         )
 
                         # add to log
-                        log.writerow(
-                            [
+                        log.writerow([
                                 user,
                                 candidate_name[:-2],
                                 i + 1,
@@ -215,8 +209,7 @@ if __name__ == "__main__":
                                 score,
                                 gesture_name,
                                 N_best_list[:50],
-                            ]
-                        )
+                        ])
 
                 print(
                     "\t\t\t\t"
@@ -251,7 +244,7 @@ if __name__ == "__main__":
                 (sum(user_recognition_scores) / len(user_recognition_scores))
                 / len(gestures)
             )
-            time_last = time_current  # for estimated time remaining
+            time_last = time_current # for estimated time remaining
 
         log.writerow(
             [
