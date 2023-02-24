@@ -1,5 +1,4 @@
 from collections import defaultdict
-import stored_gestures
 import csv
 import random
 import time
@@ -7,22 +6,23 @@ import sys
 
 from canvas import Canvas
 from recognizer import DollarRecognizer
+import stored_gestures
 
 def str2bool(v: str) -> bool:
     return v.lower() in ("yes", "true", "t", "1")
-
-OFFLINE_I = 10 # number of offline tests to run per user and E-level (set to 1 for demo, 10 for fast, 100 for accurate)
-NUM_USERS = 10 # number of users to test (set to 1 for demo, 10 for complete)
 
 # python3 1_dollar.py [live: boolean ("yes", "true", "t", "1")] [offline_i: int] [num_users: int]
 try:
     live = str2bool(sys.argv[1])
     if not live:
+        # OFFLINE_I: number of offline tests to run per user and E-level (set to 1 for demo, 10 for fast, 100 for accurate)
+        # NUM_USERS: number of users to test (set to 1 for demo, 10 for complete)
         try:
             OFFLINE_I = int(sys.argv[2])
         except:
             print("No command line argument found for OFFLINE_I: defaulting to I = 10.")
             OFFLINE_I = 10
+
         try:
             NUM_USERS = int(sys.argv[3])
         except:
