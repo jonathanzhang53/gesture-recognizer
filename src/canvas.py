@@ -153,7 +153,7 @@ class Canvas:
         if not os.path.exists(path):
             os.makedirs(path)
         xml_file = open(str(path) + "\\" + str(self.current_gesture_name) + str(int((self.sample_count-1)/16)) + ".xml", "w")
-        xml_file.write("<Gesture Name = " + str(self.current_gesture_name) + str(int((self.sample_count-1)/16)) + ">\n")
+        xml_file.write("<Gesture Name = \"" + str(self.current_gesture_name) + str(int((self.sample_count-1)/16)) + "\">\n")
 
         # write each point to XML file
         for point in self.raw_input_points:
