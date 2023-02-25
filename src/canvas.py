@@ -2,6 +2,7 @@
 
 from collections import defaultdict
 import tkinter as tk
+from tkinter import PhotoImage
 from bs4 import BeautifulSoup
 from recognizer import DollarRecognizer
 import os
@@ -31,10 +32,10 @@ class Canvas:
         self.canvas = tk.Canvas(self.root, width=300, height=200)
         self.gather_mode = gather_mode
         if self.gather_mode:
-            self.text = tk.Text(self.root, height=1, width=40, background="light grey")
-            self.text2 = tk.Text(self.root, height=2, width=40, background="light grey")
+            self.text = tk.Text(self.root, height=1, width=40, background="light grey", font=("Courier", 11))
+            self.text2 = tk.Text(self.root, height=2, width=36, background="light grey", font=("Courier", 13, "bold"))
             self.gathered_gestures = defaultdict(list)
-            self.sample_count = 1
+            self.sample_count = 150
             self.current_gesture_name = self.all_gesture_names[0]
             # to generate a username, use the current time
             self.username = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -73,6 +74,14 @@ class Canvas:
             next_button = tk.Button(self.root, text="Next Sample", command=self.store_gesture)
             next_button.pack()
 
+        # REFERENCE IMAGE FOR GATHER_MODE
+        if self.gather_mode:
+            path = Path(os.getcwd())
+            path = path.parent.absolute()
+            path = str(path) + "\\unistrokes_smaller.png"
+            img = PhotoImage(file=path)
+            tk.Label(self.root, image=img).pack()
+
         # MAIN LOOP
         self.root.mainloop()
 
@@ -92,13 +101,17 @@ class Canvas:
         """
         Store the gesture in XML format
         """
+        if self.sample_count > 160: # Do not continue if already gathered 160 gestures.
+            return
+        
         # append raw points to gesture list
         self.gathered_gestures[self.current_gesture_name].append(self.raw_input_points)
 
+        # write raw points to XML file
+        self.recordXMLfile()
+
         # increment sample count
         self.sample_count += 1
-
-        self.recordXMLfile()
 
         # update current gesture name
         # TODO: make this random (?)
@@ -112,6 +125,12 @@ class Canvas:
 
         # clear canvas for next sample
         self.clear_canvas()
+
+        #If gathered 160 samples, display so to user
+        if self.sample_count > 160:
+            self.text.delete("1.0", "end")
+            self.text2.delete("1.0", "end")
+            self.text2.insert("1.0", "All done! Thank you for your time.")
     
     def recordXMLfile(self):
         """
