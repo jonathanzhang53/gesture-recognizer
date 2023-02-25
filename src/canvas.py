@@ -16,7 +16,21 @@ class Canvas:
 
     N_RESAMPLE_POINTS = 64
 
-    def __init__(self, gather_mode=False):
+    def __init__(self, cmd_args):
+        self.gather_mode = False
+        if cmd_args.__len__() == 2:
+            self.gather_mode = bool(cmd_args[1])
+            self.username = datetime.now().strftime("%Y-%m-%d_%H-%M-%S") # use the current time to generate a new username
+            self.sample_count = 1
+        elif cmd_args.__len__() == 3:
+            self.gather_mode = bool(cmd_args[1])
+            self.username = str(cmd_args[2])
+            self.sample_count = 1
+        elif cmd_args.__len__() == 4:
+            self.gather_mode = bool(cmd_args[1])
+            self.username = str(cmd_args[2])
+            self.sample_count = int(cmd_args[3])
+
         # location of last drawn point
         self.last_x = None
         self.last_y = None
@@ -24,21 +38,17 @@ class Canvas:
         # contains the raw points for the user's currently drawn gesture
         self.raw_input_points = []
 
-        if gather_mode:
+        if self.gather_mode:
             self.all_gesture_names = ["triangle", "x", "rectangle", "circle", "check", "caret", "zig-zag", "arrow", "left_square_bracket", "right_square_bracket", "v", "delete", "left_curly_brace", "right_curly_brace", "star", "pigtail"]
 
         # GUI setup
         self.root = tk.Tk()
         self.canvas = tk.Canvas(self.root, width=300, height=200)
-        self.gather_mode = gather_mode
         if self.gather_mode:
             self.text = tk.Text(self.root, height=1, width=40, background="light grey", font=("Courier", 11))
             self.text2 = tk.Text(self.root, height=2, width=36, background="light grey", font=("Courier", 13, "bold"))
             self.gathered_gestures = defaultdict(list)
-            self.sample_count = 150
-            self.current_gesture_name = self.all_gesture_names[0]
-            # to generate a username, use the current time
-            self.username = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+            self.current_gesture_name = self.all_gesture_names[(self.sample_count-1)%self.all_gesture_names.__len__()]
         else:
             self.text = tk.Text(self.root, height=1, width=40)
 
