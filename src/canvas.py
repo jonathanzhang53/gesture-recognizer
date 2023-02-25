@@ -2,8 +2,11 @@
 
 from collections import defaultdict
 import tkinter as tk
-
+from bs4 import BeautifulSoup
 from recognizer import DollarRecognizer
+import os
+from pathlib import Path
+from datetime import datetime
 
 class Canvas:
     """
@@ -33,6 +36,8 @@ class Canvas:
             self.gathered_gestures = defaultdict(list)
             self.sample_count = 1
             self.current_gesture_name = self.all_gesture_names[0]
+            # to generate a username, use the current time
+            self.username = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         else:
             self.text = tk.Text(self.root, height=1, width=40)
 
@@ -93,13 +98,11 @@ class Canvas:
         # increment sample count
         self.sample_count += 1
 
-
-        # TODO: save to XML file
-        #print(self.raw_input_points)
+        self.recordXMLfile()
 
         # update current gesture name
         # TODO: make this random (?)
-        self.current_gesture_name = self.all_gesture_names[(self.sample_count)%self.all_gesture_names.__len__()]
+        self.current_gesture_name = self.all_gesture_names[(self.sample_count-1)%self.all_gesture_names.__len__()]
 
         # update text
         self.text.delete("1.0", "end")
@@ -109,6 +112,27 @@ class Canvas:
 
         # clear canvas for next sample
         self.clear_canvas()
+    
+    def recordXMLfile(self):
+        """
+        Record the gestures in XML format
+        """
+        # create XML file
+        path = Path(os.getcwd())
+        path = path.parent.absolute()
+        path = str(path) + "\\user_gestures\\" + str(self.username)
+        if not os.path.exists(path):
+            os.makedirs(path)
+        xml_file = open(str(path) + "\\" + str(self.current_gesture_name) + str(int((self.sample_count-1)/16)) + ".xml", "w")
+        xml_file.write("<Gesture Name = " + str(self.current_gesture_name) + str(int((self.sample_count-1)/16)) + ">\n")
+
+        # write each point to XML file
+        for point in self.raw_input_points:
+            xml_file.write("\t<Point X=\"" + str(point[0]) + "\" Y=\"" + str(point[1]) + "\"/>\n")
+
+        # close XML file
+        xml_file.write("</Gesture>")
+        xml_file.close()
 
     def paint(self, event):
         """ 
