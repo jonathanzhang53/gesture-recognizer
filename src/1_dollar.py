@@ -35,7 +35,7 @@ except:
 
 if __name__ == "__main__":
     if live:
-        canvas = Canvas()
+        canvas = Canvas(None)
         canvas.run()
     else:
         gestures = [
