@@ -166,6 +166,7 @@ class DollarRecognizer:
             a resampled list of points of length N in the format [(x, y), ...]
         """
         raw_list = self.points
+
         if len(raw_list) > 0:
             resampled_list = [raw_list[0]]
             i = self.path_length() / (self.N_RESAMPLE_POINTS - 1)
@@ -417,9 +418,3 @@ class DollarRecognizer:
         gesture, score, N_best_list = self.recognize(self.SIZE)
 
         return (gesture, score, N_best_list)
-
-
-# if __name__ == "__main__":
-#     triangle_test = stored_gestures.default_raw_gesture_templates["triangle"]
-#     triangle_recognizer = DollarRecognizer(triangle_test)
-#     print(triangle_recognizer.recognize(250))

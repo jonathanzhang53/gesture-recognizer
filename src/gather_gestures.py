@@ -1,3 +1,5 @@
+# WRITTEN BY Katherine Chan, Thomas Ruby, Jonathan Zhang
+
 import sys
 
 from canvas import Canvas

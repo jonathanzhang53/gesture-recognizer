@@ -197,8 +197,10 @@ class Canvas:
         path = Path(os.getcwd())
         path = path.parent.absolute()
         path = str(path) + "\\user_gestures\\" + str(self.username)
+
         if not os.path.exists(path):
             os.makedirs(path)
+        
         xml_file = open(
             str(path)
             + "\\"
@@ -207,6 +209,7 @@ class Canvas:
             + ".xml",
             "w",
         )
+        
         xml_file.write(
             '<Gesture Name = "'
             + str(self.current_gesture_name)
