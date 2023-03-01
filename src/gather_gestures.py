@@ -2,8 +2,11 @@ import sys
 
 from canvas import Canvas
 
+
 def str2bool(v: str) -> bool:
     return v.lower() in ("yes", "true", "t", "1")
+
+
 try:
     sys.argv[1] = str2bool(sys.argv[1])
 except IndexError:

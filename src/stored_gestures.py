@@ -1,4 +1,4 @@
-preprocessed_dataset = {} # contains preprocessed gesture data obtained from xml_logs
+preprocessed_dataset = {}  # contains preprocessed gesture data obtained from xml_logs
 """ Format:
 { User (int, 1-12) : 
     { Instance (int, 1-10) :
