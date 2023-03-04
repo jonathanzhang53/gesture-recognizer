@@ -8,6 +8,7 @@ import pickle
 
 import stored_gestures
 
+
 class DollarRecognizer:
     N_RESAMPLE_POINTS = 64
     SIZE = 250
@@ -15,7 +16,7 @@ class DollarRecognizer:
     def __init__(self, points, live=True) -> None:
         """
         Initializes the DollarRecognizer class by setting class variables and calling the processTemplates method
-        
+
         parameters:
         ----------
             points: list of points in the format [(x, y), ...]
@@ -27,24 +28,30 @@ class DollarRecognizer:
             self.readXMLDataset()
 
         self.raw_gesture_templates = stored_gestures.default_raw_gesture_templates
-        self.preprocessed_gesture_templates = defaultdict(list) # hashmap of with key = gesture name and value = list of templates
+        self.preprocessed_gesture_templates = defaultdict(
+            list
+        )  # hashmap of with key = gesture name and value = list of templates
         self.points = points
         self.processTemplates()
 
     def readXMLDataset(self, speed="medium") -> None:
         """
         Populates stored_gestures.preprocessed_dataset with the data that is contained in the xml_logs
-        
+
         parameters:
         ----------
             speed: specifies which speed type of data is to be read. Use "slow", "medium", or "fast".
         """
-        if not os.path.exists("pickled_processed_data.obj"): # if the pickled data doesn"t exist, read the xml_logs and pickle it
+        if not os.path.exists(
+            "pickled_processed_data.obj"
+        ):  # if the pickled data doesn"t exist, read the xml_logs and pickle it
             self.preprocessed_gesture_templates.clear()
 
-            print("No pickled_processed_data.obj found, reading and processing xml_logs. This may take a minute.")
+            print(
+                "No pickled_processed_data.obj found, reading and processing xml_logs. This may take a minute."
+            )
 
-            for s in range(2,12):
+            for s in range(2, 12):
                 if s >= 10:
                     s = str(s)
                 elif s < 10:
@@ -64,13 +71,15 @@ class DollarRecognizer:
 
                     for point_XML in all_points_XML:
                         self.points.append((int(point_XML["x"]), int(point_XML["y"])))
-                    
+
                     header = file_XML_data.find("gesture")
                     gesture_name = header["name"]
                     self.raw_gesture_templates[gesture_name] = self.points
 
                 self.processTemplates(read=True)
-                stored_gestures.preprocessed_dataset[int(s)] = self.preprocessed_gesture_templates
+                stored_gestures.preprocessed_dataset[
+                    int(s)
+                ] = self.preprocessed_gesture_templates
 
             print("Done reading xml_logs.")
 
@@ -80,14 +89,14 @@ class DollarRecognizer:
             # text_file.close()
 
             text_file_2 = open("pickled_processed_data.obj", "wb")
-            pickle.dump(stored_gestures.preprocessed_dataset,text_file_2)
+            pickle.dump(stored_gestures.preprocessed_dataset, text_file_2)
             text_file_2.close()
 
         text_file_3 = open("pickled_processed_data.obj", "rb")
         testing_preprocessed_dataset = pickle.load(text_file_3)
         text_file_3.close()
         stored_gestures.preprocessed_dataset = testing_preprocessed_dataset
-    
+
     def setOfflineTrainingSet(self, training_set) -> None:
         """
         Adds the map of gesture and points to the recognizer"s training set.
@@ -129,7 +138,7 @@ class DollarRecognizer:
                 self.preprocessed_gesture_templates[templateName] = self.points
             else:
                 self.preprocessed_gesture_templates[templateName].append(self.points)
-    
+
     def path_length(self) -> float:
         """
         Determines the total length of a given list of points
@@ -157,6 +166,7 @@ class DollarRecognizer:
             a resampled list of points of length N in the format [(x, y), ...]
         """
         raw_list = self.points
+
         if len(raw_list) > 0:
             resampled_list = [raw_list[0]]
             i = self.path_length() / (self.N_RESAMPLE_POINTS - 1)
@@ -191,7 +201,7 @@ class DollarRecognizer:
     def compute_centroid(self) -> tuple:
         """
         Computes the centroid of all points
-        
+
         Returns:
         ----------
             the centroid as a tuple in the format (x, y)
@@ -204,7 +214,7 @@ class DollarRecognizer:
     def indicative_angle(self) -> float:
         """
         Finds the indicative angle based on the centroid and the first point
-        
+
         Returns:
         ----------
             the indicative angle as a float in degrees
@@ -218,11 +228,11 @@ class DollarRecognizer:
     def rotate_by(self, omega) -> list:
         """
         Rotates all points by the indicative angle
-        
+
         parameters:
         ----------
             omega: indicative angle in degrees
-        
+
         Returns:
         ----------
             a list of points rotated by the indicative angle in the format [(x, y), ...)]
@@ -242,11 +252,11 @@ class DollarRecognizer:
     def scale_to(self, size) -> list:
         """
         Scales all points to a given size
-        
+
         parameters:
         ----------
             size: predetermined size value to scale to
-        
+
         Returns:
         ----------
             a list of points scaled to the predetermined size in the format [(x, y), ...)]
@@ -308,13 +318,15 @@ class DollarRecognizer:
 
         for tName, tPoints in self.preprocessed_gesture_templates.items():
             d = self.distance_at_best_angle(tPoints[0], -45, 45, 2)
-            N_Best_List.append((tName, 1 - (d / (0.5 * math.sqrt(size ** 2 + size ** 2)))))
+            N_Best_List.append(
+                (tName, 1 - (d / (0.5 * math.sqrt(size**2 + size**2))))
+            )
 
             if d < b:
                 b = d
                 gesture = tName
 
-        score = 1 - (b / (0.5 * math.sqrt(size ** 2 + size ** 2)))
+        score = 1 - (b / (0.5 * math.sqrt(size**2 + size**2)))
         N_Best_List.sort(key=lambda x: x[1], reverse=True)
 
         return (gesture, score, N_Best_List)
@@ -361,12 +373,12 @@ class DollarRecognizer:
     def distance_at_angle(self, t: list, theta: float) -> float:
         """
         Finds the distance between the given list of points and the given gesture template at the given angle
-        
+
         parameters:
         ----------
             t: the gesture template to compare the list of points to
             theta: the angle in degrees
-        
+
         Returns:
         ----------
             the distance between the given list of points and the given gesture template at the given angle
@@ -394,9 +406,9 @@ class DollarRecognizer:
         for i in range(min(len(a), len(b))):
             # calculate the distance between points a and b and add to d
             d += math.sqrt((a[i][0] - b[i][0]) ** 2 + (a[i][1] - b[i][1]) ** 2)
-            
+
         return d / len(a)
-    
+
     def run(self) -> tuple:
         self.points = self.resample()
         omega = self.indicative_angle()
@@ -406,8 +418,3 @@ class DollarRecognizer:
         gesture, score, N_best_list = self.recognize(self.SIZE)
 
         return (gesture, score, N_best_list)
-
-# if __name__ == "__main__":
-#     triangle_test = stored_gestures.default_raw_gesture_templates["triangle"]
-#     triangle_recognizer = DollarRecognizer(triangle_test)
-#     print(triangle_recognizer.recognize(250))
