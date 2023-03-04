@@ -5,6 +5,7 @@ from collections import defaultdict
 import math
 import os
 import pickle
+from pathlib import Path
 
 import stored_gestures
 
@@ -13,7 +14,7 @@ class DollarRecognizer:
     N_RESAMPLE_POINTS = 64
     SIZE = 250
 
-    def __init__(self, points, live=True) -> None:
+    def __init__(self, points, live=True, dataset="xml_logs") -> None:
         """
         Initializes the DollarRecognizer class by setting class variables and calling the processTemplates method
 
@@ -25,7 +26,7 @@ class DollarRecognizer:
         if not live:
             self.raw_gesture_templates = stored_gestures.default_raw_gesture_templates
             self.preprocessed_gesture_templates = defaultdict(dict)
-            self.readXMLDataset()
+            self.readXMLDataset(dataset)
 
         self.raw_gesture_templates = stored_gestures.default_raw_gesture_templates
         self.preprocessed_gesture_templates = defaultdict(
@@ -34,33 +35,47 @@ class DollarRecognizer:
         self.points = points
         self.processTemplates()
 
-    def readXMLDataset(self, speed="medium") -> None:
+    def readXMLDataset(self, dataset="xml_data", speed="medium") -> None:
         """
         Populates stored_gestures.preprocessed_dataset with the data that is contained in the xml_logs
 
         parameters:
         ----------
+            dataset: specifies which dataset to read. Use "xml_data" or "xml_logs".
             speed: specifies which speed type of data is to be read. Use "slow", "medium", or "fast".
         """
-        if not os.path.exists(
-            "pickled_processed_data.obj"
-        ):  # if the pickled data doesn"t exist, read the xml_logs and pickle it
+        if dataset not in ("xml_data", "user_gestures"):
+            print("ERROR: Invalid dataset specified")
+            return
+
+        if (dataset == "xml_data" and not os.path.exists("pickled_processed_xml_log_data.obj")) or (dataset == "user_gestures" and not os.path.exists("pickled_processed_user_gestures_data.obj")):  # if the pickled data doesn"t exist, read the dataset and pickle it
             self.preprocessed_gesture_templates.clear()
 
             print(
-                "No pickled_processed_data.obj found, reading and processing xml_logs. This may take a minute."
+                "No pickled data found, reading and processing " + dataset + " dataset. This may take a minute."
             )
 
-            for s in range(2, 12):
+            user_range = range(1, 12)
+            if dataset == "user_gestures":
+                user_range = range(1, 7)
+            for s in user_range:
                 if s >= 10:
                     s = str(s)
                 elif s < 10:
                     s = "0" + str(s)
 
-                print("\tProcessing user " + s + " of 11")
+                print("\tProcessing user " + str(s))
 
-                path = os.getcwd() + "\\xml_logs\\s" + s + "\\" + speed
+                if dataset == "xml_data":
+                    path = Path(os.getcwd())
+                    path = path.parent.absolute()
+                    path = str(path) + "\\xml_logs\\s" + s + "\\" + speed
+                if dataset == "user_gestures":
+                    path = Path(os.getcwd())
+                    path = path.parent.absolute()
+                    path = str(path) + "\\user_gestures\\s" + s
                 list_of_files = os.listdir(path)
+                self.raw_gesture_templates.clear()
                 self.preprocessed_gesture_templates.clear()
 
                 for file_name in list_of_files:
@@ -74,25 +89,41 @@ class DollarRecognizer:
 
                     header = file_XML_data.find("gesture")
                     gesture_name = header["name"]
+                    if dataset == "user_gestures":
+                        if int(gesture_name[-1]) < 9:
+                            gesture_name = gesture_name[:-1] + "0" + str(1+(int(gesture_name[-1])))
+                        else:
+                            gesture_name = gesture_name[:-1] + str(1+(int(gesture_name[-1])))
+                    if gesture_name is None:
+                        raise Exception("Gesture name is none")
+                    if self.points is None:
+                        raise Exception("Points is none")
                     self.raw_gesture_templates[gesture_name] = self.points
 
                 self.processTemplates(read=True)
+
                 stored_gestures.preprocessed_dataset[
                     int(s)
                 ] = self.preprocessed_gesture_templates
 
-            print("Done reading xml_logs.")
+            print("Done reading " + dataset + " dataset")
 
             # uncomment the below lines to inspect the contents of stored_gestures.preprocessed_dataset
-            # text_file = open("processed_data.txt","w")
-            # text_file.write(str(stored_gestures.preprocessed_dataset))
-            # text_file.close()
+            #text_file = open("processed_data.txt","w")
+            #text_file.write(str(stored_gestures.preprocessed_dataset))
+            #text_file.close()
 
-            text_file_2 = open("pickled_processed_data.obj", "wb")
+            if dataset == "xml_data":
+                text_file_2 = open("pickled_processed_xml_log_data.obj", "wb")
+            if dataset == "user_gestures":
+                text_file_2 = open("pickled_processed_user_gestures_data.obj", "wb")
             pickle.dump(stored_gestures.preprocessed_dataset, text_file_2)
             text_file_2.close()
 
-        text_file_3 = open("pickled_processed_data.obj", "rb")
+        if dataset == "xml_data":
+            text_file_3 = open("pickled_processed_xml_log_data.obj", "rb")
+        if dataset == "user_gestures":
+            text_file_3 = open("pickled_processed_user_gestures_data.obj", "rb")
         testing_preprocessed_dataset = pickle.load(text_file_3)
         text_file_3.close()
         stored_gestures.preprocessed_dataset = testing_preprocessed_dataset
