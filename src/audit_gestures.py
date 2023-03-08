@@ -31,14 +31,13 @@ def process_files(files):
         subject_num = re.search("\d+", file_name).group(0)
         point_count = len(root.findall(".//Point"))
 
-        # add element to top of xml file: #<Gesture Name="arrowhead~01" Subject="10" NumPts="73">
         root.set("Name", gesture_name)
         root.set("Subject", subject_num)
         root.set("NumPts", str(point_count))
 
-        # # add element to top of xml file (<?xml version="1.0" encoding="utf-8" standalone="yes"?>)
-        # xml_declaration = ET.Element("?xml version="1.0" encoding="utf-8" standalone="yes"?>")
-        # xml_declaration.append(root)
+        points = root.findall(".//Point")
+        for i, point in enumerate(points):
+            point.set("T", str(i))
 
         new_tree = ET.ElementTree(root)
         new_tree.write(file_name, encoding="utf-8", xml_declaration=True)
