@@ -1,91 +1,92 @@
-<Gesture Name = "right_square_bracket6">
-	<Point X="113" Y="54"/>
-	<Point X="117" Y="54"/>
-	<Point X="123" Y="54"/>
-	<Point X="128" Y="54"/>
-	<Point X="132" Y="54"/>
-	<Point X="135" Y="54"/>
-	<Point X="136" Y="54"/>
-	<Point X="137" Y="54"/>
-	<Point X="137" Y="53"/>
-	<Point X="139" Y="53"/>
-	<Point X="140" Y="53"/>
-	<Point X="141" Y="53"/>
-	<Point X="142" Y="54"/>
-	<Point X="143" Y="54"/>
-	<Point X="144" Y="54"/>
-	<Point X="145" Y="54"/>
-	<Point X="146" Y="54"/>
-	<Point X="147" Y="54"/>
-	<Point X="147" Y="55"/>
-	<Point X="147" Y="56"/>
-	<Point X="147" Y="58"/>
-	<Point X="148" Y="59"/>
-	<Point X="148" Y="61"/>
-	<Point X="149" Y="63"/>
-	<Point X="149" Y="66"/>
-	<Point X="150" Y="69"/>
-	<Point X="151" Y="74"/>
-	<Point X="151" Y="77"/>
-	<Point X="151" Y="80"/>
-	<Point X="151" Y="82"/>
-	<Point X="151" Y="84"/>
-	<Point X="152" Y="87"/>
-	<Point X="152" Y="89"/>
-	<Point X="152" Y="91"/>
-	<Point X="152" Y="92"/>
-	<Point X="152" Y="93"/>
-	<Point X="152" Y="94"/>
-	<Point X="152" Y="95"/>
-	<Point X="152" Y="96"/>
-	<Point X="152" Y="97"/>
-	<Point X="152" Y="98"/>
-	<Point X="152" Y="99"/>
-	<Point X="152" Y="101"/>
-	<Point X="152" Y="103"/>
-	<Point X="152" Y="105"/>
-	<Point X="152" Y="107"/>
-	<Point X="152" Y="109"/>
-	<Point X="152" Y="110"/>
-	<Point X="152" Y="111"/>
-	<Point X="152" Y="112"/>
-	<Point X="152" Y="114"/>
-	<Point X="152" Y="116"/>
-	<Point X="152" Y="118"/>
-	<Point X="152" Y="120"/>
-	<Point X="151" Y="122"/>
-	<Point X="151" Y="124"/>
-	<Point X="151" Y="125"/>
-	<Point X="151" Y="126"/>
-	<Point X="151" Y="127"/>
-	<Point X="151" Y="128"/>
-	<Point X="151" Y="129"/>
-	<Point X="151" Y="130"/>
-	<Point X="151" Y="131"/>
-	<Point X="151" Y="132"/>
-	<Point X="151" Y="133"/>
-	<Point X="150" Y="133"/>
-	<Point X="149" Y="133"/>
-	<Point X="149" Y="132"/>
-	<Point X="148" Y="132"/>
-	<Point X="146" Y="132"/>
-	<Point X="145" Y="132"/>
-	<Point X="143" Y="132"/>
-	<Point X="142" Y="132"/>
-	<Point X="141" Y="132"/>
-	<Point X="140" Y="132"/>
-	<Point X="139" Y="132"/>
-	<Point X="138" Y="132"/>
-	<Point X="136" Y="132"/>
-	<Point X="135" Y="132"/>
-	<Point X="135" Y="133"/>
-	<Point X="134" Y="133"/>
-	<Point X="132" Y="133"/>
-	<Point X="131" Y="133"/>
-	<Point X="129" Y="133"/>
-	<Point X="128" Y="133"/>
-	<Point X="126" Y="133"/>
-	<Point X="125" Y="133"/>
-	<Point X="125" Y="132"/>
-	<Point X="124" Y="132"/>
+<?xml version='1.0' encoding='utf-8'?>
+<Gesture Name="bracket6" Subject="04" NumPts="89">
+	<Point X="113" Y="54" />
+	<Point X="117" Y="54" />
+	<Point X="123" Y="54" />
+	<Point X="128" Y="54" />
+	<Point X="132" Y="54" />
+	<Point X="135" Y="54" />
+	<Point X="136" Y="54" />
+	<Point X="137" Y="54" />
+	<Point X="137" Y="53" />
+	<Point X="139" Y="53" />
+	<Point X="140" Y="53" />
+	<Point X="141" Y="53" />
+	<Point X="142" Y="54" />
+	<Point X="143" Y="54" />
+	<Point X="144" Y="54" />
+	<Point X="145" Y="54" />
+	<Point X="146" Y="54" />
+	<Point X="147" Y="54" />
+	<Point X="147" Y="55" />
+	<Point X="147" Y="56" />
+	<Point X="147" Y="58" />
+	<Point X="148" Y="59" />
+	<Point X="148" Y="61" />
+	<Point X="149" Y="63" />
+	<Point X="149" Y="66" />
+	<Point X="150" Y="69" />
+	<Point X="151" Y="74" />
+	<Point X="151" Y="77" />
+	<Point X="151" Y="80" />
+	<Point X="151" Y="82" />
+	<Point X="151" Y="84" />
+	<Point X="152" Y="87" />
+	<Point X="152" Y="89" />
+	<Point X="152" Y="91" />
+	<Point X="152" Y="92" />
+	<Point X="152" Y="93" />
+	<Point X="152" Y="94" />
+	<Point X="152" Y="95" />
+	<Point X="152" Y="96" />
+	<Point X="152" Y="97" />
+	<Point X="152" Y="98" />
+	<Point X="152" Y="99" />
+	<Point X="152" Y="101" />
+	<Point X="152" Y="103" />
+	<Point X="152" Y="105" />
+	<Point X="152" Y="107" />
+	<Point X="152" Y="109" />
+	<Point X="152" Y="110" />
+	<Point X="152" Y="111" />
+	<Point X="152" Y="112" />
+	<Point X="152" Y="114" />
+	<Point X="152" Y="116" />
+	<Point X="152" Y="118" />
+	<Point X="152" Y="120" />
+	<Point X="151" Y="122" />
+	<Point X="151" Y="124" />
+	<Point X="151" Y="125" />
+	<Point X="151" Y="126" />
+	<Point X="151" Y="127" />
+	<Point X="151" Y="128" />
+	<Point X="151" Y="129" />
+	<Point X="151" Y="130" />
+	<Point X="151" Y="131" />
+	<Point X="151" Y="132" />
+	<Point X="151" Y="133" />
+	<Point X="150" Y="133" />
+	<Point X="149" Y="133" />
+	<Point X="149" Y="132" />
+	<Point X="148" Y="132" />
+	<Point X="146" Y="132" />
+	<Point X="145" Y="132" />
+	<Point X="143" Y="132" />
+	<Point X="142" Y="132" />
+	<Point X="141" Y="132" />
+	<Point X="140" Y="132" />
+	<Point X="139" Y="132" />
+	<Point X="138" Y="132" />
+	<Point X="136" Y="132" />
+	<Point X="135" Y="132" />
+	<Point X="135" Y="133" />
+	<Point X="134" Y="133" />
+	<Point X="132" Y="133" />
+	<Point X="131" Y="133" />
+	<Point X="129" Y="133" />
+	<Point X="128" Y="133" />
+	<Point X="126" Y="133" />
+	<Point X="125" Y="133" />
+	<Point X="125" Y="132" />
+	<Point X="124" Y="132" />
 </Gesture>

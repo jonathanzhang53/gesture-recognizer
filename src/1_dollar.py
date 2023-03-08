@@ -1,3 +1,5 @@
+# WRITTEN BY Katherine Chan, Thomas Ruby, Jonathan Zhang
+
 from collections import defaultdict
 import csv
 import random
