@@ -4,10 +4,6 @@ import xml.etree.ElementTree as ET
 import os
 import re
 
-# objective: need to add these two to each user_gestures xml file
-#<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-#<Gesture Name="arrowhead~01" Subject="10" NumPts="73">
-
 directory = "../user_gestures"
 
 def get_files(directory):
