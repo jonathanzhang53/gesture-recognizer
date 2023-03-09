@@ -23,7 +23,8 @@ def process_files(files):
         root = tree.getroot()
         # print(ET.tostring(root, encoding="utf8").decode("utf8"))
 
-        gesture_name = re.search("[a-z-]+\d+\.xml", file_name).group(0)[0:-4]
+        gesture_name = re.search("[a-z-_]+\d+\.xml", file_name).group(0)[0:-4]
+        gesture_name = gesture_name[:-1] + "0" + gesture_name[-1]
         subject_num = re.search("\d+", file_name).group(0)
         point_count = len(root.findall(".//Point"))
 

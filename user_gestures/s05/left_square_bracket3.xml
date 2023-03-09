@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Gesture Name="bracket3" Subject="05" NumPts="216">
+<Gesture Name="left_square_bracket03" Subject="05" NumPts="216">
 	<Point X="173" Y="30" T="0" />
 	<Point X="172" Y="30" T="1" />
 	<Point X="171" Y="30" T="2" />

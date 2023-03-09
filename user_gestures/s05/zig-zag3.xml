@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<Gesture Name="zig-zag3" Subject="05" NumPts="236">
+<Gesture Name="zig-zag03" Subject="05" NumPts="236">
 	<Point X="43" Y="141" T="0" />
 	<Point X="44" Y="141" T="1" />
 	<Point X="44" Y="140" T="2" />
