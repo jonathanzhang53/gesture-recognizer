@@ -1,8 +1,12 @@
+# WRITTEN BY Katherine Chan, Thomas Ruby, Jonathan Zhang
+
 from collections import defaultdict
 import csv
 import random
 import time
 import sys
+import os
+from pathlib import Path
 
 from canvas import Canvas
 from recognizer import DollarRecognizer
@@ -13,12 +17,13 @@ def str2bool(v: str) -> bool:
     return v.lower() in ("yes", "true", "t", "1")
 
 
-# python3 1_dollar.py [live: boolean ("yes", "true", "t", "1")] [offline_i: int] [num_users: int]
+# python3 1_dollar.py [live: boolean ("yes", "true", "t", "1")] [offline_i: int] [num_users: int] [dataset: string ("xml_logs", "user_gestures")]
 try:
     live = str2bool(sys.argv[1])
     if not live:
         # OFFLINE_I: number of offline tests to run per user and E-level (set to 1 for demo, 10 for fast, 100 for accurate)
-        # NUM_USERS: number of users to test (set to 1 for demo, 10 for complete)
+        # NUM_USERS: number of users to test
+        # DATASET: which dataset to use. (use "xml_logs" or "user_gestures")
         try:
             OFFLINE_I = int(sys.argv[2])
         except:
@@ -30,6 +35,12 @@ try:
         except:
             print("No command line argument found for NUM_USERS: defaulting to 1 user.")
             NUM_USERS = 1
+
+        try:
+            DATASET = str(sys.argv[4])
+        except:
+            print("No command line argument found for DATASET: defaulting to \"xml_logs\".")
+            DATASET = "xml_logs"
 except:
     print("No command line argument found: defaulting to offline mode.")
     live = False  # True = online mode, False = offline mode.
@@ -40,7 +51,8 @@ if __name__ == "__main__":
         canvas = Canvas(None)
         canvas.run()
     else:
-        gestures = [
+        if DATASET == "xml_logs":
+            gestures = [
             "triangle",
             "x",
             "rectangle",
@@ -58,11 +70,33 @@ if __name__ == "__main__":
             "star",
             "pigtail",
         ]
+        elif DATASET == "user_gestures":
+            gestures = [
+            "arrow",
+            "caret",
+            "check",
+            "circle",
+            "delete",
+            "left_curly_brace",
+            "left_square_bracket",
+            "pigtail",
+            "rectangle",
+            "right_curly_brace",
+            "right_square_bracket",
+            "star",
+            "triangle",
+            "v",
+            "x",
+            "zig-zag",
+        ]
 
         print("Starting loop.")  # loop over data set
 
+        path = Path(os.getcwd())
+        path = path.parent.absolute()
+        path = str(path) + "\\recognition_logs\\recognition_log.csv"
         file = open(
-            "recognition_log.csv", "w", newline="", encoding="UTF-8"
+            path, "w", newline="", encoding="UTF-8"
         )  # open csv file for logging results
         log = csv.writer(file)
         log.writerow(
@@ -91,28 +125,33 @@ if __name__ == "__main__":
         print("Beginning random loop with I = " + str(OFFLINE_I))
 
         recognizer = DollarRecognizer(
-            points=[], live=False
+            points=[], live=False, dataset=DATASET
         )  # initialize recognizer in offline mode
+
 
         time_last = 0
         user_accuracies = []  # average recognition percentages for each user
-        for user in range(2, 2 + NUM_USERS):
+        user_range = range(2, 2  + NUM_USERS)
+        if DATASET == "user_gestures":
+            user_range = range(1, 1 + NUM_USERS)
+
+        for user in user_range:
             time_current = time.time()
             user_recognition_scores = []  # user recognition score for each example E
 
-            print("\tUser " + str(user) + " of 11.")
+            print("\tUser " + str(user))
 
             if time_last != 0:
                 print(
                     "\tEstimated time remaining: "
-                    + str(int((time_current - time_last) * (12 - user) / 60))
+                    + str(int((time_current - time_last) * (user_range.stop - user) / 60))
                     + " minutes "
-                    + str(int((time_current - time_last) * (12 - user) % 60))
+                    + str(int((time_current - time_last) * (user_range.stop - user) % 60))
                     + " seconds."
                 )
 
-            for E in range(1, 10):
-                print("\t\tE = " + str(E) + " of 9.  ", end="\n")
+            for E in range(1,10):
+                print("\t\tE = " + str(E))
 
                 user_recognition_score = 0
                 for i in range(OFFLINE_I):
@@ -157,14 +196,29 @@ if __name__ == "__main__":
                                     gesture + "0" + str(this_candidate)
                                 ]
                             )
+                            '''print("----------")
+                            print(user)
+                            print(gesture + "0" + str(this_candidate))
+                            print(stored_gestures.preprocessed_dataset[user][
+                                    gesture + "0" + str(this_candidate)
+                                ])'''
                         else:
                             candidates[gesture + str(this_candidate)].append(
                                 stored_gestures.preprocessed_dataset[user][
                                     gesture + str(this_candidate)
                                 ]
                             )
+                            '''print("----------")
+                            print(user)
+                            print(gesture + str(this_candidate))
+                            print(stored_gestures.preprocessed_dataset[user][
+                                    gesture + str(this_candidate)
+                                ])'''
 
                     recognizer.clearTrainingSet()
+                    #print("\t\t\tTraining set: " + str(templates))
+                    #print(stored_gestures.preprocessed_dataset[1].keys())
+                    #print(stored_gestures.preprocessed_dataset[1]["arrow03"])
                     recognizer.setOfflineTrainingSet(templates)
 
                     for candidate_name, candidate_points in candidates.items():

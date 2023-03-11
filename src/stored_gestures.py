@@ -1,3 +1,5 @@
+# WRITTEN BY Katherine Chan, Thomas Ruby, Jonathan Zhang
+
 preprocessed_dataset = {}  # contains preprocessed gesture data obtained from xml_logs
 """ Format:
 { User (int, 1-12) : 
