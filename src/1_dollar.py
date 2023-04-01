@@ -48,7 +48,7 @@ except:
 
 if __name__ == "__main__":
     if live:
-        canvas = Canvas(None)
+        canvas = Canvas([False])
         canvas.run()
     else:
         if DATASET == "xml_logs":
