@@ -127,8 +127,8 @@ class Canvas:
         # REFERENCE IMAGE FOR GATHER_MODE
         if self.gather_mode:
             path = Path(os.getcwd())
-            path = path.parent.absolute()
-            path = str(path) + "\\unistrokes_smaller.png"
+            path = path.absolute()
+            path = str(path) + "\\assets\\unistrokes_smaller.png"
             img = PhotoImage(file=path)
             tk.Label(self.root, image=img).pack()
 
@@ -195,7 +195,7 @@ class Canvas:
         """
         # create XML file
         path = Path(os.getcwd())
-        path = path.parent.absolute()
+        path = path.absolute()
         path = str(path) + "\\user_gestures\\" + str(self.username)
 
         if not os.path.exists(path):

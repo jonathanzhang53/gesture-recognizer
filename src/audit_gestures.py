@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ET
 import os
 import re
 
-directory = "../user_gestures"
+directory = "user_gestures"
 
 def get_files(directory):
     files = []

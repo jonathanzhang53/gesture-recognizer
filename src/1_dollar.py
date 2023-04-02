@@ -42,8 +42,8 @@ try:
             print("No command line argument found for DATASET: defaulting to \"xml_logs\".")
             DATASET = "xml_logs"
 except:
-    print("No command line argument found: defaulting to offline mode.")
-    live = False  # True = online mode, False = offline mode.
+    print("No command line argument found: defaulting to online mode.")
+    live = True  # True = online mode, False = offline mode.
 
 
 if __name__ == "__main__":
