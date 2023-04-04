@@ -26,9 +26,11 @@ TODO: insert image and description of process
 
 ## Collecting Gesture Data
 
-`python src/gather_gestures.py true [OPTIONAL: username] [OPTIONAL: sample # to resume at]`
+`python src/gather_gestures.py ["1dollar" / "numeric"] [OPTIONAL: username] [OPTIONAL: sample # to resume at]`
 
 TODO: insert image and description of process
+
+Gather either the "1dollar" gesture set or the "numeric" 0-9 gesture set.
 
 Once you collect your batch of user gestures, make sure to copy the data elsewhere before collecting a new batch to ensure that data from different experiments is separated.
 

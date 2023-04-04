@@ -1,13 +1,13 @@
 # WRITTEN BY Katherine Chan, Thomas Ruby, Jonathan Zhang
 
-from collections import defaultdict
-import tkinter as tk
-from tkinter import PhotoImage
-from bs4 import BeautifulSoup
 from recognizer import DollarRecognizer
-import os
+
+from collections import defaultdict
+from tkinter import PhotoImage
 from pathlib import Path
 from datetime import datetime
+import os
+import tkinter as tk
 
 
 class Canvas:
@@ -18,21 +18,26 @@ class Canvas:
     N_RESAMPLE_POINTS = 64
 
     def __init__(self, cmd_args):
-        self.gather_mode = False
+        self.gather_mode = ""
         if cmd_args.__len__() == 2:
-            self.gather_mode = bool(cmd_args[1])
+            self.gather_mode = str(cmd_args[1])
             self.username = datetime.now().strftime(
                 "%Y-%m-%d_%H-%M-%S"
             )  # use the current time to generate a new username
             self.sample_count = 1
         elif cmd_args.__len__() == 3:
-            self.gather_mode = bool(cmd_args[1])
+            self.gather_mode = str(cmd_args[1])
             self.username = str(cmd_args[2])
             self.sample_count = 1
         elif cmd_args.__len__() == 4:
-            self.gather_mode = bool(cmd_args[1])
+            self.gather_mode = str(cmd_args[1])
             self.username = str(cmd_args[2])
             self.sample_count = int(cmd_args[3])
+
+        if self.gather_mode not in ["", "1dollar", "numeric"]:
+            raise ValueError(
+                "Invalid argument for gather mode. Please enter '1dollar' or 'numeric'"
+            )
 
         # location of last drawn point
         self.last_x = None
@@ -41,7 +46,7 @@ class Canvas:
         # contains the raw points for the user's currently drawn gesture
         self.raw_input_points = []
 
-        if self.gather_mode:
+        if self.gather_mode == "1dollar":
             self.all_gesture_names = [
                 "triangle",
                 "x",
@@ -60,11 +65,24 @@ class Canvas:
                 "star",
                 "pigtail",
             ]
+        elif self.gather_mode == "numeric":
+            self.all_gesture_names = [
+                "0",
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+            ]
 
         # GUI setup
         self.root = tk.Tk()
         self.canvas = tk.Canvas(self.root, width=300, height=200)
-        if self.gather_mode:
+        if self.gather_mode != "":
             self.text = tk.Text(
                 self.root,
                 height=1,
@@ -98,9 +116,9 @@ class Canvas:
 
         # TEXT
         self.text.pack()
-        if self.gather_mode:
+        if self.gather_mode != "":
             self.text2.pack()
-            self.text.insert("1.0", "Sample " + str(self.sample_count) + " of 160")
+            self.text.insert("1.0", "Sample " + str(self.sample_count) + " of " + str(10 * len(self.all_gesture_names)))
             self.text2.insert(
                 "1.0", "Please draw a: " + str.upper(self.current_gesture_name)
             )
@@ -118,17 +136,23 @@ class Canvas:
         clear_button.pack()
 
         # NEXT BUTTON FOR GATHER_MODE
-        if self.gather_mode:
+        if self.gather_mode != "":
             next_button = tk.Button(
                 self.root, text="Next Sample", command=self.store_gesture
             )
             next_button.pack()
 
         # REFERENCE IMAGE FOR GATHER_MODE
-        if self.gather_mode:
+        if self.gather_mode == "1dollar":
             path = Path(os.getcwd())
             path = path.absolute()
             path = str(path) + "\\assets\\unistrokes_smaller.png"
+            img = PhotoImage(file=path)
+            tk.Label(self.root, image=img).pack()
+        elif self.gather_mode == "numeric":
+            path = Path(os.getcwd())
+            path = path.absolute()
+            path = str(path) + "\\assets\\numeric_smaller.png"
             img = PhotoImage(file=path)
             tk.Label(self.root, image=img).pack()
 
@@ -175,7 +199,7 @@ class Canvas:
         # update text
         self.text.delete("1.0", "end")
         self.text2.delete("1.0", "end")
-        self.text.insert("1.0", "Sample " + str(self.sample_count) + " of 160")
+        self.text.insert("1.0", "Sample " + str(self.sample_count) + " of " + str(10 * len(self.all_gesture_names)))
         self.text2.insert(
             "1.0", "Please draw a: " + str.upper(self.current_gesture_name)
         )
@@ -183,8 +207,8 @@ class Canvas:
         # clear canvas for next sample
         self.clear_canvas()
 
-        # If gathered 160 samples, display so to user
-        if self.sample_count > 160:
+        # If gathered 10 * # of samples, display so to user
+        if self.sample_count > 10 * len(self.all_gesture_names):
             self.text.delete("1.0", "end")
             self.text2.delete("1.0", "end")
             self.text2.insert("1.0", "All done! Thank you for your time.")
