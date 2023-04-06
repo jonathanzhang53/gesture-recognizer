@@ -67,16 +67,16 @@ class Canvas:
             ]
         elif self.gather_mode == "numeric":
             self.all_gesture_names = [
-                "0",
-                "1",
-                "2",
-                "3",
-                "4",
-                "5",
-                "6",
-                "7",
-                "8",
-                "9",
+                "zero",
+                "one",
+                "two",
+                "three",
+                "four",
+                "five",
+                "six",
+                "seven",
+                "eight",
+                "nine",
             ]
 
         # GUI setup
@@ -178,7 +178,7 @@ class Canvas:
         """
         Store the gesture in XML format
         """
-        if self.sample_count > 160:  # Do not continue if already gathered 160 gestures.
+        if self.sample_count > 10 * len(self.all_gesture_names):  # Do not continue if already gathered 10 * gesture count
             return
 
         # append raw points to gesture list
@@ -191,9 +191,8 @@ class Canvas:
         self.sample_count += 1
 
         # update current gesture name
-        # TODO: make this random (?)
         self.current_gesture_name = self.all_gesture_names[
-            (self.sample_count - 1) % self.all_gesture_names.__len__()
+            (self.sample_count - 1) % len(self.all_gesture_names)
         ]
 
         # update text
@@ -229,7 +228,7 @@ class Canvas:
             str(path)
             + "\\"
             + str(self.current_gesture_name)
-            + str(int((self.sample_count - 1) / 16))
+            + str(int((self.sample_count - 1) / len(self.all_gesture_names)))
             + ".xml",
             "w",
         )
@@ -237,7 +236,7 @@ class Canvas:
         xml_file.write(
             '<Gesture Name = "'
             + str(self.current_gesture_name)
-            + str(int((self.sample_count - 1) / 16))
+            + str(int((self.sample_count - 1) / len(self.all_gesture_names)))
             + '">\n'
         )
 

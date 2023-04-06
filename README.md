@@ -16,11 +16,15 @@ Katherine Chan, Thomas Ruby, Jonathan Zhang
 
 TODO: insert image and description of process
 
+The true parameter signals that the recognition is online or live.
+
 ## Offline / Test Recognition
 
 `python src/1_dollar.py false [OPTIONAL: iterations] [OPTIONAL: num users]`
 
 - Defaults: 10 iterations, 1 user
+
+The false parameter signals that the recognition is offline or not live.
 
 TODO: insert image and description of process
 
@@ -28,15 +32,17 @@ TODO: insert image and description of process
 
 `python src/gather_gestures.py ["1dollar" / "numeric"] [OPTIONAL: username] [OPTIONAL: sample # to resume at]`
 
-TODO: insert image and description of process
-
 Gather either the "1dollar" gesture set or the "numeric" 0-9 gesture set.
 
-Once you collect your batch of user gestures, make sure to copy the data elsewhere before collecting a new batch to ensure that data from different experiments is separated.
+Usernames should begin with a prefix character such as 'n' for a subject drawing the numeric gesture set.
+
+TODO: insert image and description of process
 
 ## Data Exploration
 
-`python src/audit_gestures.py` after generating user_gestures from gesture data collection (run only ONCE)
+`python src/audit_gestures.py ['s' / 'n' / other prefix]` after generating user_gestures from gesture data collection (run only ONCE)
+
+Audit directories of subjects by specifying the gesture set prefix.
 
 TODO: insert GHOST image and description of process
 
