@@ -20,7 +20,7 @@ The true parameter signals that the recognition is online or live.
 
 ## Offline / Test Recognition
 
-`python src/1_dollar.py false [OPTIONAL: iterations] [OPTIONAL: num users]`
+`python src/1_dollar.py false [int: iterations] [int: num users] [string: dataset]`
 
 - Defaults: 10 iterations, 1 user
 
