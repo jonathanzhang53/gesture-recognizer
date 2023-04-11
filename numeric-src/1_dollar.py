@@ -12,30 +12,28 @@ from canvas import Canvas
 from recognizer import DollarRecognizer
 import stored_gestures
 
-live = False
-if not live:
-    # offline iteration count
-    OFFLINE_I = 10
-    NUM_USERS = 6
-    DATASET = "numeric"
-    gestures = [
-        "one",
-        "two",
-        "three",
-        "four",
-        "five",
-        "six",
-        "seven",
-        "eight",
-        "nine",
-        "zero",
-    ]
+live = True
+OFFLINE_I = 10
+NUM_USERS = 6
+DATASET = "numeric"
+gestures = [
+    "one",
+    "two",
+    "three",
+    "four",
+    "five",
+    "six",
+    "seven",
+    "eight",
+    "nine",
+    "zero",
+]
 
 if __name__ == "__main__":
     if live:
-        canvas = Canvas([False])
+        canvas = Canvas()
         canvas.run()
-    else:
+    elif not live:
         print("Starting loop.")  # loop over data set
 
         path = Path(os.getcwd())
