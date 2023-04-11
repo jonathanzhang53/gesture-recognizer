@@ -44,7 +44,7 @@ class DollarRecognizer:
             dataset: specifies which dataset to read. Use "xml_data" or "xml_logs".
             speed: specifies which speed type of data is to be read. Use "slow", "medium", or "fast".
         """
-        if dataset not in ("xml_data", "user_gestures"):
+        if dataset not in ("xml_logs", "user_gestures", "numeric"):
             print("ERROR: Invalid dataset specified")
             return
 
