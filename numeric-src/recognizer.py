@@ -48,7 +48,7 @@ class DollarRecognizer:
             print("ERROR: Invalid dataset specified")
             return
 
-        if (dataset == "xml_data" and not os.path.exists("pickled_processed_xml_log_data.obj")) or (dataset == "user_gestures" and not os.path.exists("pickled_processed_user_gestures_data.obj")):  # if the pickled data doesn"t exist, read the dataset and pickle it
+        if (dataset == "xml_data" and not os.path.exists("pickled_processed_xml_log_data.obj")) or (dataset == "user_gestures" and not os.path.exists("pickled_processed_user_gestures_data.obj")) or (dataset == "numeric" and not os.path.exists("pickled_processed_numeric_data.obj")):  # if the pickled data doesn"t exist, read the dataset and pickle it
             self.preprocessed_gesture_templates.clear()
 
             print(
@@ -56,7 +56,7 @@ class DollarRecognizer:
             )
 
             user_range = range(1, 12)
-            if dataset == "user_gestures":
+            if dataset == "user_gestures" or dataset == "numeric":
                 user_range = range(1, 7)
             for s in user_range:
                 if s >= 10:
@@ -74,6 +74,10 @@ class DollarRecognizer:
                     path = Path(os.getcwd())
                     path = path.parent.absolute()
                     path = str(path) + "\\user_gestures\\s" + s
+                if dataset == "numeric":
+                    path = Path(os.getcwd())
+                    path = path.parent.absolute()
+                    path = str(path) + "\\numeric\\n" + s
                 list_of_files = os.listdir(path)
                 self.raw_gesture_templates.clear()
                 self.preprocessed_gesture_templates.clear()
@@ -81,19 +85,20 @@ class DollarRecognizer:
                 for file_name in list_of_files:
                     self.points = []
                     file = open(path + "\\" + file_name, "r", encoding="UTF-8")
-                    file_XML_data = BeautifulSoup(file.read(), "lxml")
-                    all_points_XML = file_XML_data.find_all("point")
+                    file_XML_data = BeautifulSoup(file.read(), features="xml")
+                    all_points_XML = file_XML_data.find_all("Point")
+
 
                     for point_XML in all_points_XML:
-                        self.points.append((int(point_XML["x"]), int(point_XML["y"])))
+                        self.points.append((int(point_XML["X"]), int(point_XML["Y"])))
 
-                    header = file_XML_data.find("gesture")
-                    gesture_name = header["name"]
-                    if dataset == "user_gestures":
+                    header = file_XML_data.find("Gesture")
+                    gesture_name = header["Name"]
+                    '''if dataset == "user_gestures" or dataset == "numeric":
                         if int(gesture_name[-1]) < 9:
-                            gesture_name = gesture_name[:-1] + "0" + str(1+(int(gesture_name[-1])))
+                            gesture_name = gesture_name[:-1] + "0" + str((int(gesture_name[-1])))
                         else:
-                            gesture_name = gesture_name[:-1] + str(1+(int(gesture_name[-1])))
+                            gesture_name = gesture_name[:-1] + str((int(gesture_name[-1])))'''
                     if gesture_name is None:
                         raise Exception("Gesture name is none")
                     if self.points is None:
@@ -109,14 +114,16 @@ class DollarRecognizer:
             print("Done reading " + dataset + " dataset")
 
             # uncomment the below lines to inspect the contents of stored_gestures.preprocessed_dataset
-            #text_file = open("processed_data.txt","w")
-            #text_file.write(str(stored_gestures.preprocessed_dataset))
-            #text_file.close()
+            text_file = open("processed_data.txt","w")
+            text_file.write(str(stored_gestures.preprocessed_dataset))
+            text_file.close()
 
             if dataset == "xml_data":
                 text_file_2 = open("pickled_processed_xml_log_data.obj", "wb")
             if dataset == "user_gestures":
                 text_file_2 = open("pickled_processed_user_gestures_data.obj", "wb")
+            if dataset == "numeric":
+                text_file_2 = open("pickled_processed_numeric_data.obj", "wb")
             pickle.dump(stored_gestures.preprocessed_dataset, text_file_2)
             text_file_2.close()
 
@@ -124,6 +131,8 @@ class DollarRecognizer:
             text_file_3 = open("pickled_processed_xml_log_data.obj", "rb")
         if dataset == "user_gestures":
             text_file_3 = open("pickled_processed_user_gestures_data.obj", "rb")
+        if dataset == "numeric":
+            text_file_3 = open("pickled_processed_numeric_data.obj", "rb")
         testing_preprocessed_dataset = pickle.load(text_file_3)
         text_file_3.close()
         stored_gestures.preprocessed_dataset = testing_preprocessed_dataset
@@ -301,10 +310,23 @@ class DollarRecognizer:
 
         scaled_points = []
 
-        for point in self.points:
-            q_x = point[0] * size / b_width
-            q_y = point[1] * size / b_height
-            scaled_points.append((q_x, q_y))
+        TWO_DIMENSIONAL_RATIO = 10 # defines the ratio of the bounding box to determine if the gesture is 2 dimensional
+
+        if b_height == 0 or b_width/b_height > TWO_DIMENSIONAL_RATIO: # if the gesture is 1 dimensional along the x axis, do not scale the y axis
+            for point in self.points:
+                q_x = point[0] * size / b_width
+                q_y = point[1]
+                scaled_points.append((q_x, q_y))
+        elif b_width == 0 or b_height/b_width > TWO_DIMENSIONAL_RATIO: # if the gesture is 1 dimensional along the y axis, do not scale the x axis
+            for point in self.points:
+                q_x = point[0]
+                q_y = point[1] * size / b_height
+                scaled_points.append((q_x, q_y))
+        else:
+            for point in self.points: # for all other gestures, scale both axes
+                q_x = point[0] * size / b_width
+                q_y = point[1] * size / b_height
+                scaled_points.append((q_x, q_y))
 
         return scaled_points
 

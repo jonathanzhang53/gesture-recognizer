@@ -12,7 +12,7 @@ from canvas import Canvas
 from recognizer import DollarRecognizer
 import stored_gestures
 
-live = True
+live = False
 OFFLINE_I = 10
 NUM_USERS = 6
 DATASET = "numeric"
