@@ -45,7 +45,9 @@ if __name__ == "__main__":
         log = csv.writer(file)
         log.writerow(
             [
-                "Recognition Log: Katherine Chan, Thomas Ruby, Jonathan Zhang // $1 Recognizer // XML Dataset // USER-DEPENDENT RANDOM-"
+                "Recognition Log: Katherine Chan, Thomas Ruby, Jonathan Zhang // $1 Recognizer // "
+                + str((DATASET)).capitalize()
+                + " Dataset // USER-DEPENDENT RANDOM-"
                 + str(OFFLINE_I)
             ]
         )
@@ -105,7 +107,7 @@ if __name__ == "__main__":
                     # value: candidate_points
 
                     for gesture in gestures:
-                        possible_template = [i for i in range(1, 11)]
+                        possible_template = [i for i in range(0, 10)]
 
                         for j in range(1, E + 1):
                             # choose E templates from U,G set
@@ -202,9 +204,9 @@ if __name__ == "__main__":
                     "\t\t\t\t"
                     + str(user_recognition_score)
                     + " of "
-                    + str(OFFLINE_I * 16)
+                    + str(OFFLINE_I * 10)
                     + " gestures ("
-                    + (str(100 * (user_recognition_score / (OFFLINE_I * 16)))[:5])
+                    + (str(100 * (user_recognition_score / (OFFLINE_I * 10)))[:5])
                     + "%) recognized correctly for E = "
                     + str(E)
                     + "."
@@ -242,4 +244,4 @@ if __name__ == "__main__":
         log.writerow("")
         file.close()
 
-        print("See recognition_log.csv for results.")
+        print("See assets/recognition_logs/recognition_log.csv for results.")
