@@ -28,12 +28,23 @@ class DollarRecognizer:
             self.preprocessed_gesture_templates = defaultdict(dict)
             self.readXMLDataset(dataset)
 
-        self.raw_gesture_templates = stored_gestures.default_raw_gesture_templates
-        self.preprocessed_gesture_templates = defaultdict(
-            list
-        )  # hashmap of with key = gesture name and value = list of templates
         self.points = points
-        self.processTemplates()
+
+        # self.raw_gesture_templates = stored_gestures.default_raw_gesture_templates
+        # self.preprocessed_gesture_templates = defaultdict(
+        #     list
+        # )  # hashmap of with key = gesture name and value = list of templates
+        # self.processTemplates()
+        # print(self.preprocessed_gesture_templates.keys())
+
+        gests = pickle.load(
+            open("pickled_processed_numeric_data.obj", "rb")
+        )
+        gests = gests[6]
+        self.preprocessed_gesture_templates = {}
+        for name in ["one00", "two00", "three00", "four00", "five00", "six00", "seven00", "eight00", "nine00", "zero00"]:
+            self.preprocessed_gesture_templates[name[:-2]] = gests[name]
+        # print(self.preprocessed_gesture_templates.keys())
 
     def readXMLDataset(self, dataset="xml_data", speed="medium") -> None:
         """
@@ -139,7 +150,7 @@ class DollarRecognizer:
 
     def setOfflineTrainingSet(self, training_set) -> None:
         """
-        Adds the map of gesture and points to the recognizer"s training set.
+        Adds the map of gesture and points to the recognizer's training set.
 
         parameters:
         ----------
@@ -370,7 +381,7 @@ class DollarRecognizer:
         N_Best_List = []
 
         for tName, tPoints in self.preprocessed_gesture_templates.items():
-            d = self.distance_at_best_angle(tPoints[0], -45, 45, 2)
+            d = self.distance_at_best_angle(tPoints, -45, 45, 2)
             N_Best_List.append(
                 (tName, 1 - (d / (0.5 * math.sqrt(size**2 + size**2))))
             )

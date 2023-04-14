@@ -26,7 +26,7 @@ class Canvas:
         self.text = tk.Text(self.root, height=1, width=40)
 
         # initialize DollarRecognizer
-        self.dollar_recognizer = DollarRecognizer(self.raw_input_points, True)
+        self.dollar_recognizer = DollarRecognizer(self.raw_input_points, True, "numeric")
 
     def run(self):
         """
@@ -64,8 +64,9 @@ class Canvas:
         self.text.delete("1.0", "end")
         self.text.insert(
             "1.0",
-            "Result: " + name_of_gesture + ", Score: " + str(gesture_score)[0:5],
+            "Result: " + str(name_of_gesture) + ", Score: " + str(gesture_score)[0:5],
         )
+        # print(N_best_list)
 
     def paint(self, event):
         """
