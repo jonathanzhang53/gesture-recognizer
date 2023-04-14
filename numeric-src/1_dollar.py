@@ -13,7 +13,7 @@ from recognizer import DollarRecognizer
 import stored_gestures
 
 live = False
-OFFLINE_I = 10
+OFFLINE_I = 100
 NUM_USERS = 6
 DATASET = "numeric"
 gestures = [
